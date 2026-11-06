@@ -114,7 +114,7 @@ public final class MainActivity extends Activity {
         if(isFinishing()||isDestroyed())return;
         boolean pageChanged=!screen.equals(which);
         if(activeScroll!=null)scrollPositions.put(screen,activeScroll.getScrollY());
-        if(body!=null)body.animate().cancel();
+        if(activeScroll!=null)activeScroll.animate().cancel();
         screen=which;updateStatus=null;root.removeAllViews();
         LinearLayout header=column();root.addView(header);text(header,"歪脖树修炼笔记",23,true);text(header,which,14,false);
         ScrollView scroll=new ScrollView(this);activeScroll=scroll;scroll.setSmoothScrollingEnabled(true);scroll.setFillViewport(true);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));body=column();scroll.addView(body);
@@ -127,8 +127,8 @@ public final class MainActivity extends Activity {
         int savedY=scrollPositions.containsKey(which)?scrollPositions.get(which):0;
         scroll.post(()->scroll.scrollTo(0,savedY));
         if(pageChanged&&android.animation.ValueAnimator.areAnimatorsEnabled()){
-            body.setAlpha(0);body.setTranslationY(dp(6));
-            body.animate().alpha(1).translationY(0).setDuration(180).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+            scroll.setAlpha(0);scroll.setTranslationY(dp(6));
+            scroll.animate().alpha(1).translationY(0).withLayer().setDuration(180).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
         }
     }
     List<JSONObject> dayRows(String day){List<JSONObject> out=new ArrayList<>();for(JSONObject r:store.sorted())if(r.optString("date").equals(day))out.add(r);return out;}

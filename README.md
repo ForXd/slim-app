@@ -33,7 +33,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 SIGN_MODE=unsigned sh android/build.sh
 ```
 
-输出 `artifacts/qingji-0.5.0-unsigned.apk`。也可设置 `BUILD_TOOLS` 和 `ANDROID_JAR` 覆盖 SDK 路径。
+输出 `artifacts/qingji-0.5.1-unsigned.apk`。也可设置 `BUILD_TOOLS` 和 `ANDROID_JAR` 覆盖 SDK 路径。
 
 发布必须使用与用户已安装版本相同的私钥。已有版本延续原本本地 Android debug 签名，仅用于个人 APK 分发；仓库不保存私钥。请自行建立并妥善备份签名密钥，自己的分支无法直接覆盖官方安装版。
 

@@ -1,0 +1,5 @@
+INSTRUMENTATION_RESULT: migrated=true
+INSTRUMENTATION_RESULT: photoReport=[{"photo":"kung-pao.jpg","milliseconds":51,"candidates":[{"name":"Kung Pao chicken","score":0.9609375,"chinese":"宫保鸡丁","matches":1},{"name":"Caponata","score":0.00390625,"chinese":"Caponata","matches":0},{"name":"Carne de porco à alentejana","score":0.00390625,"chinese":"Carne de porco à alentejana","matches":0}]},{"photo":"mapo-tofu.jpg","milliseconds":14,"candidates":[{"name":"Mapo doufu","score":0.99609375,"chinese":"麻婆豆腐","matches":1}]},{"photo":"braised-pork.jpg","milliseconds":13,"candidates":[{"name":"Unagi","score":0.3203125,"chinese":"鳗鱼","matches":0},{"name":"Chazuke","score":0.125,"chinese":"茶泡饭","matches":0},{"name":"Bún bò Huế","score":0.05859375,"chinese":"Bún bò Huế","matches":0}]}]
+INSTRUMENTATION_RESULT: records=[{"kind":"weight","date":"2026-11-06","kg":68.5,"id":"1793966695499-6777971f-2574-43f1-a0a8-de52d360f34e"}]
+INSTRUMENTATION_RESULT: result=PASS
+INSTRUMENTATION_CODE: -1
