@@ -1,0 +1,16 @@
+{
+  "result": "PASS",
+  "package": "cn.qingji.diary",
+  "version": "0.7.0",
+  "versionCode": 8,
+  "bytes": 51371437,
+  "sha256": "c743029642283026232d08b9718e2ee1aa46c775cd78f9f2f8439994abbdbe0b",
+  "signerSha256": "dde7659242a72af8dbfa0798827a15bfec3be64e84a2adde2e928a61bb111751",
+  "sameSignerAs": "0.6.0",
+  "seasonAssets": [
+    "assets/ui/season-autumn.png",
+    "assets/ui/season-spring.png",
+    "assets/ui/season-summer.png",
+    "assets/ui/season-winter.png"
+  ]
+}

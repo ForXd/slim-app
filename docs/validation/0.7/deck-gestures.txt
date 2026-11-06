@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: attached deck short drag rebound, threshold advance, first/last boundaries, preserved backing stack, ACTION_CANCEL, multiple pointers, settling-touch race, recovery, ScrollView diagonal drag and vertical scroll arbitration, detached animation cancellation
+INSTRUMENTATION_CODE: -1

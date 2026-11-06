@@ -1,4 +1,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
- <item><shape><solid android:color="#F8F3E8"/><corners android:radius="24dp"/></shape></item>
+ <item>
+  <vector android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+   <path android:fillColor="@color/icon_background" android:pathData="M25,0 L83,0 A25,25 0,0 1,108 25 L108,83 A25,25 0,0 1,83 108 L25,108 A25,25 0,0 1,0 83 L0,25 A25,25 0,0 1,25 0 Z"/>
+  </vector>
+ </item>
  <item android:drawable="@drawable/tree_mark"/>
 </layer-list>

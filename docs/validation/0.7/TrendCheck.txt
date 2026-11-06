@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: leap February, inclusive dates, partial meal sums, unknown-only days, zero versus missing, annual monthly buckets and day-weighted mean, latest daily weight and monthly average, future exclusion and metric isolation
+INSTRUMENTATION_CODE: -1

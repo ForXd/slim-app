@@ -27,8 +27,9 @@ public final class MainActivity extends Activity {
     String selectedPhoto="";
     final android.util.LruCache<String,Bitmap> photoCache=new android.util.LruCache<String,Bitmap>(8*1024*1024){protected int sizeOf(String k,Bitmap b){return b.getByteCount();}};
     ChallengeScreen challenges;
+    TrendScreen trendScreen;
+    PlanScreen plans;
     AppUpdater updater;
-    TextView updateStatus;
     Runnable updatePanelRefresh;
     FoodDatabase foods;
     OfflineFood model;
@@ -53,9 +54,9 @@ public final class MainActivity extends Activity {
         getWindow().setStatusBarColor(paper);getWindow().setNavigationBarColor(paper);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
         style=new JournalStyle(this);store=new JournalStore(this);model=new OfflineFood(this);
-        challenges=new ChallengeScreen(this);updater=AppUpdater.get(this);
+        challenges=new ChallengeScreen(this);trendScreen=new TrendScreen(this);plans=new PlanScreen(this);updater=AppUpdater.get(this);
         root=column();root.setPadding(0,0,0,0);root.setBackground(style.paper());setContentView(root);
-        text(root,"歪脖树修炼笔记",32,true);text(root,"正在准备离线食物库…",16,false);
+        TextView opening=style.heading("靓女修炼笔记",28,ink);root.addView(opening);text(root,"正在加载…",16,false);
         worker.execute(()->{try{foods=new FoodDatabase(this);PhotoFiles.prune(this,store.rows());runOnUiThread(()->{if(store.migrated())show(screen);else migrate();});}
         catch(Exception e){runOnUiThread(()->error("食物库加载失败，请重新打开应用。"));}});
     }
@@ -77,12 +78,12 @@ public final class MainActivity extends Activity {
     LinearLayout column(){LinearLayout v=new LinearLayout(this);v.setOrientation(LinearLayout.VERTICAL);v.setPadding(dp(18),dp(10),dp(18),dp(10));return v;}
     LinearLayout row(LinearLayout parent){LinearLayout v=new LinearLayout(this);v.setGravity(Gravity.CENTER_VERTICAL);parent.addView(v,new LinearLayout.LayoutParams(-1,-2));return v;}
     TextView text(LinearLayout parent,String label,int size,boolean bold){
-        TextView t=new TextView(this);t.setText(label);t.setTextSize(size);t.setTextColor(ink);t.setPadding(0,dp(5),0,dp(5));t.setIncludeFontPadding(false);if(style!=null)t.setTypeface(style.serif,bold?Typeface.BOLD:Typeface.NORMAL);
+        TextView t=style.label(label,size,bold,ink);t.setPadding(0,dp(5),0,dp(5));
         parent.addView(t);return t;
     }
     Button button(LinearLayout parent,String label,Runnable action){
         Button b=new Button(this);b.setText(label);b.setAllCaps(false);b.setTextColor(accent);b.setMinHeight(dp(48));b.setTextSize(15);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setStateListAnimator(null);
-        b.setTypeface(style.serif);b.setBackground(style.ripple(0x55ffffff,10,true));
+        b.setTypeface(style.medium);b.setLetterSpacing(0);b.setIncludeFontPadding(false);b.setBackground(style.ripple(0x55ffffff,10,true));
         LinearLayout.LayoutParams layout=new LinearLayout.LayoutParams(-1,-2);layout.setMargins(dp(3),dp(4),dp(3),dp(4));
         parent.addView(b,layout);b.setOnClickListener(v->{v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);action.run();});return b;
     }
@@ -117,8 +118,14 @@ public final class MainActivity extends Activity {
         boolean pageChanged=!screen.equals(which);
         if(activeScroll!=null)scrollPositions.put(screen,activeScroll.getScrollY());
         if(activeScroll!=null)activeScroll.animate().cancel();
-        screen=which;updateStatus=null;root.removeAllViews();
-        if(!which.equals("今日")){LinearLayout header=column();root.addView(header);text(header,which.equals("百次")?"百次修炼":which,27,true);TextView subtitle=text(header,"歪脖树修炼笔记",11,false);subtitle.setTextColor(style.muted);}
+        screen=which;root.removeAllViews();
+        if(!which.equals("今日")){
+            LinearLayout header=column();root.addView(header);
+            LinearLayout titleRow=row(header);
+            TextView title=style.heading(which.equals("百次")?"百次修炼":which,26,ink);
+            titleRow.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+            updateEntry(titleRow);
+        }
         ScrollView scroll=new ScrollView(this);activeScroll=scroll;scroll.setSmoothScrollingEnabled(true);scroll.setFillViewport(true);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));body=column();body.setPadding(dp(14),which.equals("今日")?0:dp(4),dp(14),dp(12));scroll.setClipToPadding(false);scroll.setVerticalScrollBarEnabled(false);scroll.addView(body);
         tabs=new LinearLayout(this);tabs.setPadding(dp(8),dp(4),dp(8),dp(3));tabs.setBackgroundColor(paper);root.addView(tabs);
         String[] tabNames={"今日","食物库","百次","趋势","计划"},icons={"book_open_page_variant_outline","bowl_mix_outline","sprout_outline","chart_line","bullseye_arrow"};
@@ -150,12 +157,11 @@ public final class MainActivity extends Activity {
     }
     JSONObject copy(JSONObject object){try{return new JSONObject(object.toString());}catch(Exception e){return new JSONObject();}}
     void edit(JSONObject r){switch(r.optString("kind")){case "exercise":exercise(r);break;case "weight":weight(r);break;default:meal(r);}}
-    void history(){
-        LinearLayout content=column();AlertDialog dialog=dialog("全部历史",content);
-        for(JSONObject r:store.sorted()){
-            button(content,r.optString("date")+" · "+r.optString("food",r.optString("sport",r.optString("kg")+" kg")),()->{dialog.dismiss();edit(r);});
-        }
-        if(store.sorted().isEmpty())text(content,"还没有记录",16,false);
+    void history(){new JournalCalendar(this).show();}
+    void openDay(String day){
+        try{java.time.LocalDate date=java.time.LocalDate.parse(day);if(date.isAfter(java.time.LocalDate.now()))return;
+            selectedDate=day;if(activeScroll!=null)activeScroll.scrollTo(0,0);scrollPositions.put("今日",0);show("今日");
+        }catch(RuntimeException e){toast("日期无效");}
     }
     AlertDialog dialog(String title,LinearLayout content){
         ScrollView scroll=new ScrollView(this);scroll.addView(content);
@@ -248,51 +254,36 @@ public final class MainActivity extends Activity {
         }catch(Exception e){toast(e.getMessage());}});
     }
     void plan(){
-        JSONObject old=store.plan();text(body,"每日摄入计划",23,true);
-        text(body,"面向一般成年人。未成年人、孕哺期及需疾病饮食管理者应个别制定目标。",13,false);
-        Spinner type=spinner(body,"计划类型",planNames,Arrays.asList(planNames).indexOf(old.optString("name")));
-        EditText base=input(body,"无专项运动日的维持热量（千卡）",old.optString("base"),true);
-        EditText target=input(body,"每日摄入目标（千卡）",old.optString("target"),true);
-        TextView info=text(body,"",14,false);
-        Runnable update=()->{
-            int index=type.getSelectedItemPosition();target.setEnabled(index==3);
-            int deficit=index==1?250:index==2?500:0;
-            info.setText(index==3?"填写自己的每日目标。":"每日目标 = 维持热量 − "+deficit+" 千卡");
-            if(index!=3){try{target.setText(n(Double.parseDouble(base.getText().toString())-deficit));}catch(Exception e){target.setText("");}}
-        };
-        type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){public void onItemSelected(AdapterView<?> p,View v,int pos,long id){update.run();}public void onNothingSelected(AdapterView<?> p){}});
-        base.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int b,int c){update.run();}public void afterTextChanged(Editable e){}});
-        text(body,"温和档减少250千卡，标准档减少500千卡。摄入目标支持1500千卡以下的自定义值；请按自身情况设定，维持热量可按既有测算结果填写。运动额外消耗单独记录。",14,false);
-        button(body,"保存每日计划",()->{try{
-            double intake=number(target,1,6500);JSONObject p=new JSONObject();put(p,"name",type.getSelectedItem());put(p,"target",intake);
-            if(type.getSelectedItemPosition()!=3||!base.getText().toString().isEmpty())put(p,"base",number(base,1200,6500));
-            if(!store.prefs.edit().putString("plan",p.toString()).commit())throw new Exception("保存失败");
-            show("今日");toast("计划已更新");
-        }catch(Exception e){toast(e.getMessage());}});
-        button(body,"应用更新 · "+updater.currentVersion(),()->updates());
-        button(body,"营养数据库与模型来源",()->{try{LinearLayout f=column();text(f,FoodDatabase.read(this,"sources.txt")+"\n\n"+FoodDatabase.read(this,"NOTICE.txt")+"\n\n"+FoodDatabase.read(this,"EveryDay-Food-LICENSE.txt")+"\n\n"+FoodDatabase.read(this,"ui/SOURCES.txt"),13,false);dialog("数据来源",f);}catch(Exception e){error("无法读取来源");}});
+        plans.render();
+        button(body,"主题与语录",this::appearance);
+        button(body,"应用更新 · "+updater.currentVersion(),this::checkUpdates);
+        button(body,"数据来源",()->{try{LinearLayout f=column();text(f,FoodDatabase.read(this,"sources.txt")+"\n\n"+FoodDatabase.read(this,"NOTICE.txt")+"\n\n"+FoodDatabase.read(this,"EveryDay-Food-LICENSE.txt")+"\n\n"+FoodDatabase.read(this,"ui/SOURCES.txt"),13,false);dialog("数据来源",f);}catch(Exception e){error("无法读取来源");}});
     }
-    void charts(){
-        horizontalButtons(body,"近7天",()->{chartDays=7;show("趋势");},"近30天",()->{chartDays=30;show("趋势");});
-        String[] labels={"摄入","运动","体重"},keys={"kcal","burn","kg"};
-        LinearLayout types=row(body);
-        for(int i=0;i<3;i++){final String key=keys[i];Button b=button(types,labels[i],()->{chartMetric=key;show("趋势");});b.setLayoutParams(new LinearLayout.LayoutParams(0,-2,1));}
-        text(body,(chartMetric.equals("kg")?"体重 · kg":chartMetric.equals("burn")?"运动额外消耗 · 千卡":"饮食摄入 · 千卡")+" / 近"+chartDays+"天",20,true);
-        List<Double> values=new ArrayList<>();List<String> dates=new ArrayList<>();List<Boolean> partial=new ArrayList<>();
-        Calendar date=Calendar.getInstance();date.add(Calendar.DATE,1-chartDays);
-        for(int i=0;i<chartDays;i++){
-            String day=new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(date.getTime());dates.add(day);date.add(Calendar.DATE,1);
-            List<JSONObject> rows=dayRows(day);Double value=null;boolean incomplete=false;
-            for(JSONObject r:rows){
-                if(chartMetric.equals("kg")&&r.optString("kind").equals("weight")&&value==null)value=r.optDouble("kg");
-                else if(!chartMetric.equals("kg")&&JournalStore.known(r,chartMetric))value=(value==null?0:value)+r.optDouble(chartMetric);
-                if(chartMetric.equals("kcal")&&r.optString("kind").equals("meal")&&!JournalStore.known(r,"kcal"))incomplete=true;
-            }
-            values.add(value);partial.add(incomplete);
-        }
-        body.addView(new TrendView(this,values,dates,chartMetric.equals("kg")),new LinearLayout.LayoutParams(-1,dp(220)));
-        text(body,"空白日期没有记录，＊表示当天还有热量待补。体重取当日最后录入的一次。",13,false);
-        for(int i=dates.size()-1;i>=0;i--)if(values.get(i)!=null)text(body,dates.get(i)+"    "+n(values.get(i))+(partial.get(i)?"＊":""),16,false);
+    void charts(){trendScreen.render();}
+    static final String DEFAULT_QUOTE="慢慢来，每一次都算数。";
+    android.content.SharedPreferences preferences(){return getSharedPreferences("ui-preferences",0);}
+    String quote(){return preferences().getString("quote",DEFAULT_QUOTE);}
+    void editQuote(){
+        LinearLayout form=column();EditText value=input(form,"我的激励语录",quote(),false);
+        value.setSingleLine(false);value.setMinLines(2);value.setMaxLines(4);value.setFilters(new InputFilter[]{new InputFilter.LengthFilter(80)});
+        AlertDialog d=dialog("写给自己",form);
+        button(form,"保存语录",()->{String text=value.getText().toString().trim();if(text.isEmpty()){value.setError("写一句喜欢的话吧");return;}
+            if(!preferences().edit().putString("quote",text).commit()){toast("保存失败，请重试");return;}d.dismiss();show(screen);});
+        button(form,"恢复默认",()->{if(preferences().edit().remove("quote").commit()){d.dismiss();show(screen);}});
+    }
+    void appearance(){
+        LinearLayout form=column();String pref=preferences().getString("theme","auto");
+        String theme=SeasonTheme.resolve(pref,java.time.LocalDate.now()).title;
+        AlertDialog d=dialog("主题与语录",form);
+        button(form,(pref.equals("auto")?"自动 · ":"")+theme,()->{d.dismiss();chooseTheme();});
+        button(form,"编辑激励语录",()->{d.dismiss();editQuote();});
+    }
+    void chooseTheme(){
+        String[] values={"auto","spring","summer","autumn","winter"};String[] labels={"自动随四季","春日田野","夏日湖泊","秋日柿子","冬日雪花"};
+        String pref=preferences().getString("theme","auto");int current=Math.max(0,Arrays.asList(values).indexOf(pref));
+        new AlertDialog.Builder(this).setTitle("四季主题").setSingleChoiceItems(labels,current,(d,which)->{
+            if(preferences().edit().putString("theme",values[which]).commit()){style.refreshSeason();d.dismiss();show(screen);}else toast("保存失败，请重试");
+        }).setNegativeButton("取消",null).show();
     }
     void photoMenu(){
         new AlertDialog.Builder(this).setTitle("离线拍照识餐").setItems(new String[]{"拍摄一道菜","从相册选择","云端识别（可选）"},(d,which)->{
@@ -355,6 +346,18 @@ public final class MainActivity extends Activity {
         view.setTag(name);Bitmap cached=photoCache.get(name);if(cached!=null){view.setImageBitmap(cached);return;}
         worker.execute(()->{Bitmap image=PhotoFiles.load(this,name);if(image!=null){photoCache.put(name,image);runOnUiThread(()->{if(!isDestroyed()&&name.equals(view.getTag()))view.setImageBitmap(image);});}});
     }
+    /** Explicit manual entry: open status immediately, then request a fresh check. */
+    void checkUpdates(){updates();updater.check(true);}
+    Button updateEntry(LinearLayout parent){
+        Button check=button(parent,"检查更新",this::checkUpdates);
+        check.setTextSize(13);check.setSingleLine(true);
+        check.setMinWidth(0);check.setMinimumWidth(0);
+        check.setPadding(dp(10),dp(8),dp(10),dp(8));
+        check.setBackground(style.ripple(0x55ffffff,9,true));
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,-2);
+        p.leftMargin=dp(10);check.setLayoutParams(p);
+        return check;
+    }
     void updates(){
         LinearLayout form=column();
         text(form,"当前版本 "+updater.currentVersion(),18,true);
@@ -366,7 +369,7 @@ public final class MainActivity extends Activity {
         Button download=button(form,"下载新版",()->updater.download());
         Button install=button(form,"安装新版",()->updater.install(this));
         Button cancel=button(form,"取消下载",()->updater.cancel());
-        text(form,"通过 GitHub Releases 检查和下载。验证文件摘要、包名、版本及签名后，由 Android 确认覆盖安装。",13,false);
+        text(form,"更新保留本地记录，安装需系统确认。",13,false);
         AlertDialog dialog=dialog("应用更新",form);
         updatePanelRefresh=()->{
             state.setText(updater.message);
@@ -381,8 +384,9 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onResume(){
         super.onResume();
+        if(style!=null&&style.refreshSeason()&&foods!=null&&migration==null)show(screen);
         if(updater!=null){
-            updater.observe(()->{if(updateStatus!=null)updateStatus.setText(updater.message);if(updatePanelRefresh!=null)updatePanelRefresh.run();});
+            updater.observe(()->{if(updatePanelRefresh!=null)updatePanelRefresh.run();});
             updater.check(false);
         }
     }

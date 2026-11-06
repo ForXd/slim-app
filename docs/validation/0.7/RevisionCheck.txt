@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: Mifflin estimate, actual preset deficit and floors, low BMI, custom below 1500, surplus, invalid inputs; leap calendar and future bounds; automatic/manual season boundaries
+INSTRUMENTATION_CODE: -1

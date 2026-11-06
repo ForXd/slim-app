@@ -1,8 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.qingji.diary" android:versionCode="7" android:versionName="0.6.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.qingji.diary" android:versionCode="8" android:versionName="0.7.0">
   <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="34"/>
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
-  <application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:label="歪脖树修炼笔记" android:allowBackup="false" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+  <application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:label="靓女修炼笔记" android:allowBackup="false" android:theme="@android:style/Theme.Material.Light.NoActionBar">
     <provider android:name=".MealPhoto" android:authorities="cn.qingji.diary.photo" android:exported="false" android:grantUriPermissions="true"/>
     <provider android:name=".UpdatePackage" android:authorities="cn.qingji.diary.updates" android:exported="false" android:grantUriPermissions="true"/>
     <activity android:name=".MainActivity" android:configChanges="orientation|screenSize|keyboardHidden" android:exported="true">

@@ -12,11 +12,21 @@ import java.io.*;
 final class JournalStyle {
     final MainActivity app;
     final Typeface serif;
-    final Bitmap paper,branch;
+    final Typeface body=Typeface.create("sans-serif",Typeface.NORMAL);
+    final Typeface medium=Typeface.create("sans-serif-medium",Typeface.NORMAL);
+    final Bitmap paper;
+    Bitmap branch;
+    private String seasonKey="";
     final int muted=0xff826955,line=0xffe4d4bf;
     JournalStyle(MainActivity app){
         this.app=app;serif=Typeface.createFromAsset(app.getAssets(),"ui/journal-serif.otf");
-        paper=asset("paper.png",2);branch=asset("tomato-branch.png",2);
+        paper=asset("paper.png",2);refreshSeason();
+    }
+    boolean refreshSeason(){
+        SeasonTheme season=SeasonTheme.resolve(app.preferences().getString("theme","auto"),java.time.LocalDate.now());
+        if(season.key.equals(seasonKey))return false;
+        Bitmap next=asset(season.asset,2);if(next==null)next=asset("tomato-branch.png",2);
+        branch=next;seasonKey=season.key;return true;
     }
     Bitmap asset(String name,int sample){try(InputStream in=app.getAssets().open("ui/"+name)){BitmapFactory.Options o=new BitmapFactory.Options();o.inSampleSize=sample;return BitmapFactory.decodeStream(in,null,o);}catch(IOException e){return null;}}
     Drawable paper(){
@@ -31,9 +41,12 @@ final class JournalStyle {
         Drawable d=app.getDrawable(id).mutate();d.setTint(color);d.setBounds(0,0,app.dp(dp),app.dp(dp));return d;
     }
     ImageView image(String name,int color,int size){ImageView i=new ImageView(app);i.setImageDrawable(icon(name,color,size));i.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);return i;}
-    TextView label(String value,int size,boolean bold,int color){TextView t=new TextView(app);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setTypeface(serif,bold?Typeface.BOLD:Typeface.NORMAL);t.setIncludeFontPadding(false);t.setLineSpacing(app.dp(3),1);return t;}
+    TextView label(String value,int size,boolean bold,int color){TextView t=new TextView(app);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setTypeface(bold?medium:body);t.setLetterSpacing(0);t.setIncludeFontPadding(false);t.setLineSpacing(app.dp(2),1.08f);return t;}
+    /** Serif is reserved for editorial headings; the bundled regular font is never faux-bolded. */
+    TextView heading(String value,int size,int color){TextView t=label(value,size,false,color);t.setTypeface(serif);t.setLineSpacing(0,1.08f);return t;}
+    TextView number(String value,int size,int color){TextView t=label(value,size,true,color);t.setFontFeatureSettings("'tnum' 1, 'lnum' 1");t.setLineSpacing(0,1);return t;}
     Button action(LinearLayout parent,String label,String icon,Runnable run){
-        Button b=app.button(parent,label,run);b.setTextColor(0xfffff9ef);b.setTypeface(serif,Typeface.BOLD);b.setTextSize(21);b.setBackground(ripple(app.accent,13,false));b.setCompoundDrawables(icon(icon,0xfffff9ef,30),null,null,null);b.setCompoundDrawablePadding(app.dp(9));
+        Button b=app.button(parent,label,run);b.setTextColor(0xfffff9ef);b.setTextSize(20);b.setBackground(ripple(app.accent,13,false));b.setCompoundDrawables(icon(icon,0xfffff9ef,30),null,null,null);b.setCompoundDrawablePadding(app.dp(9));
         b.setPadding(app.dp(18),app.dp(10),app.dp(14),app.dp(10));return b;
     }
     void space(LinearLayout p,int height){p.addView(new View(app),new LinearLayout.LayoutParams(1,app.dp(height)));}

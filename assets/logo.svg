@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 108 108"><rect width="108" height="108" rx="25" fill="#F8F3E8"/><path fill="#DCE8D8" d="M31,79 C40,74 66,74 77,79 C68,86 41,86 31,79Z"/><path fill="#765342" d="M45,79 C49,69 53,63 49,55 L43,44 L49,41 L57,54 C63,65 57,73 55,79Z"/><path fill="#765342" d="M52,61 L65,49 L68,51 L57,65Z"/><path fill="#245C47" d="M51,26 C35,21 24,32 28,44 C20,54 30,64 43,61 C54,67 70,61 71,49 C77,37 66,26 51,26Z"/><path fill="#4C8962" d="M49,29 C38,27 29,35 33,44 C40,49 49,45 53,38 C57,32 54,30 49,29Z"/><path fill="#B8D480" d="M62,29 C60,21 66,16 76,17 C76,26 71,31 62,29Z"/><path fill="#F8F3E8" d="M37,51 C44,54 52,51 56,46 L58,48 C53,55 44,58 37,54Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 108 108" role="img" aria-labelledby="title desc">
+  <title id="title">靓女修炼笔记</title>
+  <desc id="desc">朱红底色上，一本米白色的打开笔记本，书脊中央长出一枝新芽。</desc>
+  <rect width="108" height="108" rx="25" fill="#B23924"/>
+  <!-- Keep all foreground geometry inside the adaptive icon's central safe circle. -->
+  <g fill="#FAF4EA">
+    <path d="M52,48.5 C45.4,44.1 38.5,42.5 30.2,43.2 C28.9,43.3 28,44.3 28,45.6 L28,69 C28,70.3 29.2,71.3 30.5,71.2 C38.8,70.6 45.7,72.4 52,77 Z"/>
+    <path d="M56,48.5 C62.6,44.1 69.5,42.5 77.8,43.2 C79.1,43.3 80,44.3 80,45.6 L80,69 C80,70.3 78.8,71.3 77.5,71.2 C69.2,70.6 62.3,72.4 56,77 Z"/>
+    <path d="M53.6,41.5 C46.1,42.1 41.7,38.1 41.2,32 C48.6,31.5 53.2,35 53.6,41.5 Z"/>
+    <path d="M54.7,36.8 C54.9,29.6 60.1,26.3 67.6,27 C67,33.5 62.4,37.5 54.7,36.8 Z"/>
+  </g>
+  <path d="M54,50 C53.2,44.6 54,39.8 57.4,34.1" fill="none" stroke="#FAF4EA" stroke-width="2.6" stroke-linecap="round"/>
+</svg>

@@ -23,7 +23,6 @@ final class ChallengeScreen {
     ChallengeScreen(MainActivity app){this.app=app;store=new ChallengeStore(app.getSharedPreferences("challenges-v1",0));}
     void render(){
         searchHandler.removeCallbacks(searchRefresh);
-        TextView intro=app.text(app.body,"每一次都算数 · 左右滑动切换挑战",12,false);intro.setTextColor(app.style.muted);
         app.horizontalButtons(app.body,"新建挑战",()->editTitle(null),archived?"查看进行中":"查看已归档",()->{archived=!archived;selected=null;app.show("百次");});
         EditText search=new EditText(app);search.setText(query);search.setHint("搜索挑战名称");search.setContentDescription("搜索挑战名称");search.setSingleLine(true);search.setTextSize(15);search.setBackgroundTintList(ColorStateList.valueOf(app.accent));app.body.addView(search,new LinearLayout.LayoutParams(-1,app.dp(48)));search.setCompoundDrawables(app.style.icon("magnify",app.style.muted,20),null,null,null);search.setCompoundDrawablePadding(app.dp(8));search.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
         search.setOnEditorActionListener((v,id,e)->{search.clearFocus();((InputMethodManager)app.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(search.getWindowToken(),0);return true;});
@@ -38,37 +37,35 @@ final class ChallengeScreen {
             if(visible.isEmpty()){app.text(results,query.trim().isEmpty()?(archived?"这里会保留你归档的每一次努力。":"试试「散步100次」或「自己做饭100次」。"):"没有找到这个挑战，换个关键词试试。",15,false);return;}
             int active=0;for(int i=0;i<visible.size();i++)if(visible.get(i).getString("id").equals(selected))active=i;
             selected=visible.get(active).getString("id");
-            pager=new ChallengePager(app);results.addView(pager,new LinearLayout.LayoutParams(-1,app.dp(96)));
-            for(int i=0;i<visible.size();i++){
-                JSONObject item=visible.get(i);final int index=i;LinearLayout card=app.column();card.setPadding(app.dp(18),app.dp(10),app.dp(18),app.dp(10));
-                LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(app.dp(280),-1);p.setMargins(0,app.dp(7),0,app.dp(7));pager.strip.addView(card,p);
-                TextView name=app.style.label(item.getString("title"),18,true,app.ink);card.addView(name);name.setMaxLines(1);name.setEllipsize(TextUtils.TruncateAt.END);
-                app.style.space(card,7);card.addView(app.style.label(item.getJSONObject("cells").length()+" / 100"+(item.optBoolean("archived")?"  ·  已归档":"  ·  次修炼"),14,false,app.style.muted));
-                card.setContentDescription(item.getString("title")+"，"+item.getJSONObject("cells").length()+"次，点击切换");card.setOnClickListener(v->pager.select(index));
-            }
+            pager=new ChallengePager(app);results.addView(pager,new LinearLayout.LayoutParams(-1,app.dp(184*Math.max(1,app.getResources().getConfiguration().fontScale))));
+            final List<JSONObject> cardItems=new ArrayList<>(visible);
             LinearLayout navigation=app.row(results);
             Button previous=previousButton=app.button(navigation,"上一个",()->pager.select(pager.selected-1));previous.setLayoutParams(new LinearLayout.LayoutParams(app.dp(72),app.dp(42)));previous.setTextSize(11);previous.setPadding(0,0,0,0);
             position=app.text(navigation,"",12,false);position.setGravity(Gravity.CENTER);position.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);position.setLayoutParams(new LinearLayout.LayoutParams(0,-2,1));
             Button next=nextButton=app.button(navigation,"下一个",()->pager.select(pager.selected+1));next.setLayoutParams(new LinearLayout.LayoutParams(app.dp(72),app.dp(42)));next.setTextSize(11);next.setPadding(0,0,0,0);
             detail=new LinearLayout(app);detail.setOrientation(LinearLayout.VERTICAL);results.addView(detail);
-            pager.configure(visible.size(),active,index->{try{selected=visible.get(index).getString("id");renderDetail();}catch(Exception e){app.error(e.getMessage());}});
+            pager.configure(visible.size(),active,index->deckCard(cardItems.get(index),index,cardItems.size()),index->{try{selected=visible.get(index).getString("id");renderDetail();}catch(Exception e){app.error(e.getMessage());}});
             renderDetail();
         }catch(Exception e){app.error("无法读取挑战："+e.getMessage());}
+    }
+    View deckCard(JSONObject item,int index,int count){
+        LinearLayout card=app.column();card.setBackground(app.style.surface(0xfffbf2e5,16,true));card.setPadding(app.dp(19),app.dp(12),app.dp(19),app.dp(12));
+        LinearLayout top=app.row(card);TextView eyebrow=app.style.label(item.optBoolean("archived")?"已归档":"百次挑战",11,false,app.style.muted);top.addView(eyebrow,new LinearLayout.LayoutParams(0,-2,1));
+        top.addView(app.style.number(String.format(Locale.US,"%02d / %02d",index+1,count),10,app.style.muted));app.style.space(card,7);
+        TextView title=app.style.heading(item.optString("title"),21,app.accent);title.setMaxLines(1);title.setEllipsize(TextUtils.TruncateAt.END);card.addView(title);
+        app.style.space(card,9);int done=item.optJSONObject("cells").length();
+        LinearLayout footer=app.row(card);TextView progress=app.style.number(done+" / 100",26,app.ink);footer.addView(progress,new LinearLayout.LayoutParams(0,-2,1));if(done==100)footer.addView(app.style.label("已完成",11,false,app.style.muted));
+        card.setContentDescription(item.optString("title")+"，"+done+"次");return card;
     }
     static boolean matches(JSONObject item,boolean archived,String query){return item.optBoolean("archived")==archived&&item.optString("title").toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT));}
     void renderDetail()throws Exception{
         detail.removeAllViews();JSONObject active=store.get(selected);final String id=selected;int activeIndex=0;
-        for(int i=0;i<visible.size();i++){
-            boolean chosen=visible.get(i).getString("id").equals(id);if(chosen)activeIndex=i;
-            LinearLayout card=(LinearLayout)pager.strip.getChildAt(i);card.setBackground(new android.graphics.drawable.InsetDrawable(app.style.ripple(chosen?0xfff2e2cf:0x55ffffff,12,true),0,0,app.dp(10),0));
-            card.setPadding(app.dp(18),app.dp(10),app.dp(24),app.dp(10));
-            ((TextView)card.getChildAt(0)).setTextColor(chosen?app.accent:app.ink);
-        }
-        position.setText((activeIndex+1)+" / "+visible.size()+" 个挑战");previousButton.setEnabled(activeIndex>0);nextButton.setEnabled(activeIndex<visible.size()-1);
+        for(int i=0;i<visible.size();i++)if(visible.get(i).getString("id").equals(id))activeIndex=i;
+        position.setText((activeIndex+1)+" / "+visible.size()+" 个挑战");previousButton.setEnabled(activeIndex>0);nextButton.setEnabled(activeIndex<visible.size()-1);previousButton.setAlpha(activeIndex>0?1:.35f);nextButton.setAlpha(activeIndex<visible.size()-1?1:.35f);
         LinearLayout card=app.card(detail);card.setPadding(app.dp(8),app.dp(12),app.dp(8),app.dp(12));
         int count=active.getJSONObject("cells").length();app.text(card,count==100?"一百次完成，真好。":"已完成 "+count+" 次 · 还差 "+(100-count)+" 次",16,true);
         ProgressBar progress=new ProgressBar(app,null,android.R.attr.progressBarStyleHorizontal);progress.setMax(100);progress.setProgress(count);progress.setProgressTintList(ColorStateList.valueOf(app.accent));card.addView(progress);
-        app.text(card,archived?"已归档，重新开启后可继续记录。":"轻点格子，记录这一次的小小收获。",11,false);
+        app.text(card,archived?"已归档，重新开启后可继续记录。":"点格子记录",11,false);
         JSONObject cells=active.getJSONObject("cells");
         for(int row=0;row<10;row++){
             LinearLayout line=new LinearLayout(app);card.addView(line);

@@ -31,3 +31,5 @@ tests/*.ts
 /tsconfig.json
 /tests/runtime-fixture.*
 /tests/sites-worker.test.mjs
+
+__pycache__/

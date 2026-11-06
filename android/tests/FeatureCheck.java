@@ -30,6 +30,13 @@ public final class FeatureCheck extends Instrumentation {
   check(ChallengeScreen.matches(new JSONObject().put("title","Walk 散步").put("archived",false),false," walk "),"case-insensitive search");
   check(!ChallengeScreen.matches(new JSONObject().put("title","散步").put("archived",true),false,"散步"),"archive search scope");
   check(PhotoFiles.load(getTargetContext(),"../../outside.jpg")==null,"photo path traversal");
+  check(ChallengePager.destination(0,4,-110,0,400,650)==1,"deck threshold next");
+  check(ChallengePager.destination(2,4,110,0,400,650)==1,"deck threshold previous");
+  check(ChallengePager.destination(1,4,-30,0,400,650)==1,"deck short drag returns");
+  check(ChallengePager.destination(1,4,-30,-900,400,650)==2,"deck deliberate fling");
+  check(ChallengePager.destination(0,4,200,900,400,650)==0,"deck start edge");
+  check(ChallengePager.destination(3,4,-200,-900,400,650)==3,"deck end edge");
+  check(ChallengePager.destination(0,1,-200,-900,400,650)==0,"single card stays");
   AppUpdater updater=AppUpdater.get(getTargetContext());java.io.File installed=new java.io.File(getTargetContext().getApplicationInfo().sourceDir);
   AppUpdater.Release same=new AppUpdater.Release(updater.currentVersion(),updater.currentCode(),"",installed.length(),AppUpdater.digest(installed),"");
   rejects(()->updater.verify(installed,same));

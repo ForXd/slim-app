@@ -5,3 +5,5 @@ SIL Open Font License: licenses/NotoSerif-OFL.txt (also packaged).
 Font is subset to Latin, punctuation, CJK unified/extension A, and full-width forms using fontTools. Uncovered characters retain Android fallback.
 Standard icons: https://github.com/Templarian/MaterialDesign (original SVG paths retained, converted to Android VectorDrawable).
 License: licenses/MaterialDesignIcons-Apache.txt (also packaged).
+
+Seasonal watercolor artwork: original built-in image_gen outputs, 2026-11-06. Full prompts and attribution: seasonal-sources.md (packaged). Pencil icon: project-owned vector geometry.

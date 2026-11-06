@@ -1,9 +1,17 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
- <path android:fillColor="#DCE8D8" android:pathData="M31,79 C40,74 66,74 77,79 C68,86 41,86 31,79Z"/>
- <path android:fillColor="#765342" android:pathData="M45,79 C49,69 53,63 49,55 L43,44 L49,41 L57,54 C63,65 57,73 55,79Z"/>
- <path android:fillColor="#765342" android:pathData="M52,61 L65,49 L68,51 L57,65Z"/>
- <path android:fillColor="#245C47" android:pathData="M51,26 C35,21 24,32 28,44 C20,54 30,64 43,61 C54,67 70,61 71,49 C77,37 66,26 51,26Z"/>
- <path android:fillColor="#4C8962" android:pathData="M49,29 C38,27 29,35 33,44 C40,49 49,45 53,38 C57,32 54,30 49,29Z"/>
- <path android:fillColor="#B8D480" android:pathData="M62,29 C60,21 66,16 76,17 C76,26 71,31 62,29Z"/>
- <path android:fillColor="#F8F3E8" android:pathData="M37,51 C44,54 52,51 56,46 L58,48 C53,55 44,58 37,54Z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Open notebook and new growth; geometry matches assets/logo.svg. -->
+    <path android:fillColor="#FAF4EA"
+        android:pathData="M52,48.5 C45.4,44.1 38.5,42.5 30.2,43.2 C28.9,43.3 28,44.3 28,45.6 L28,69 C28,70.3 29.2,71.3 30.5,71.2 C38.8,70.6 45.7,72.4 52,77 Z"/>
+    <path android:fillColor="#FAF4EA"
+        android:pathData="M56,48.5 C62.6,44.1 69.5,42.5 77.8,43.2 C79.1,43.3 80,44.3 80,45.6 L80,69 C80,70.3 78.8,71.3 77.5,71.2 C69.2,70.6 62.3,72.4 56,77 Z"/>
+    <path android:fillColor="#FAF4EA"
+        android:pathData="M53.6,41.5 C46.1,42.1 41.7,38.1 41.2,32 C48.6,31.5 53.2,35 53.6,41.5 Z"/>
+    <path android:fillColor="#FAF4EA"
+        android:pathData="M54.7,36.8 C54.9,29.6 60.1,26.3 67.6,27 C67,33.5 62.4,37.5 54.7,36.8 Z"/>
+    <path android:fillColor="@android:color/transparent"
+        android:strokeColor="#FAF4EA" android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:pathData="M54,50 C53.2,44.6 54,39.8 57.4,34.1"/>
 </vector>
