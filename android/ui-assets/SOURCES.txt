@@ -1,0 +1,7 @@
+Visual direction: user-provided paper journal reference (docs/design/0.6/reference.png).
+Paper texture and tomato branch: generated for this project with image_gen, 2026-11-06.
+Noto Serif CJK SC Regular: https://github.com/notofonts/noto-cjk/blob/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Regular.otf
+SIL Open Font License: licenses/NotoSerif-OFL.txt (also packaged).
+Font is subset to Latin, punctuation, CJK unified/extension A, and full-width forms using fontTools. Uncovered characters retain Android fallback.
+Standard icons: https://github.com/Templarian/MaterialDesign (original SVG paths retained, converted to Android VectorDrawable).
+License: licenses/MaterialDesignIcons-Apache.txt (also packaged).

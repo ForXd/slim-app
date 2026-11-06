@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: challenge 100 cells, repeated edit, timestamps, undo, archive, reopen, persistence, invalid input; challenge name filtering and archive scope; photo path rejection; update manifest, URL restrictions, downgrade and hash rejection
+INSTRUMENTATION_CODE: -1

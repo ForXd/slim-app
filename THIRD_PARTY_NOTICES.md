@@ -6,3 +6,6 @@
 - USDA FoodData Central SR Legacy 2018: public-domain US government data. Attribution and download URL in android/data/sources.txt.
 - HowToCook test photographs: Unlicense, tests/photos/LICENSE.txt and sources.json.
 - Qingya (ForXd/tree-growh), MIT, served as interaction reference; challenge and updater implementations are native Java in this project.
+- Noto Serif CJK SC Regular (Noto/Adobe/Google contributors), SIL Open Font License 1.1. CJK/Latin subset distributed as android/ui-assets/journal-serif.otf; license in licenses/NotoSerif-OFL.txt and APK UI assets.
+- Material Design Icons (Pictogrammers contributors), Apache-2.0; source SVG paths in assets/icons, converted to native Android vector resources. License in licenses/MaterialDesignIcons-Apache.txt.
+- Paper texture and tomato botanical artwork generated for this project with image_gen (2026-11-06).

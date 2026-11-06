@@ -3,4 +3,5 @@
 <application android:label="歪脖树修炼笔记验证"/>
 <instrumentation android:name="cn.qingji.diary.NativeCheck" android:targetPackage="cn.qingji.diary"/>
 <instrumentation android:name="cn.qingji.diary.FeatureCheck" android:targetPackage="cn.qingji.diary"/>
+<instrumentation android:name="cn.qingji.diary.UiFixture" android:targetPackage="cn.qingji.diary"/>
 </manifest>

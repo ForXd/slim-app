@@ -7,6 +7,9 @@ platform=${ANDROID_JAR:-"${ANDROID_HOME:?Set ANDROID_HOME}/platforms/android-35/
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/classes" "$stage/dex" "$stage/assets" artifacts
+mkdir -p "$stage/assets/ui"
+cp android/ui-assets/* "$stage/assets/ui/"
+cp licenses/NotoSerif-OFL.txt licenses/MaterialDesignIcons-Apache.txt "$stage/assets/ui/"
 cp public/journal/migrate.html "$stage/assets/"
 cp -R android/model/. android/data/. "$stage/assets/"
 python3 - "$stage/AndroidManifest.xml" <<'PY'
