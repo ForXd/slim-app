@@ -1,0 +1,7 @@
+Google AIY Food Classifier v1, copyright Google, Apache License 2.0.
+https://www.kaggle.com/models/google/aiy/tfLite/vision-classifier-food-v1/1
+Model distributed unmodified. English labels extracted from the model.
+TensorFlow Lite 2.16.1 (TensorFlow Authors), Apache License 2.0.
+See TensorFlow-LICENSE.txt in the APK assets.
+Nutrition reference: USDA FoodData Central, SR Legacy (2018).
+https://fdc.nal.usda.gov/download-datasets/

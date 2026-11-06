@@ -1,0 +1,29 @@
+# Local products and credentials
+artifacts/
+*.idsig
+*.keystore
+*.jks
+.env*
+!.env.example
+.DS_Store
+.npmrc
+.openai/
+node_modules/
+dist/
+test-results/
+playwright-report/
+# Historical web prototype (native Android is maintained here)
+/src/
+/worker/
+public/*
+!public/journal/
+public/journal/*
+!public/journal/migrate.html
+index.html
+package*.json
+*.ts
+mobile-runtime.lock.json
+preview*.jpg
+design-qa.md
+scripts/*.mjs
+tests/*.ts

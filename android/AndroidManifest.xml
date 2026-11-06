@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.qingji.diary" android:versionCode="5" android:versionName="0.5.0">
+  <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="34"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+  <application android:label="歪脖树修炼笔记" android:allowBackup="false" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+    <provider android:name=".MealPhoto" android:authorities="cn.qingji.diary.photo" android:exported="false" android:grantUriPermissions="true"/>
+    <provider android:name=".UpdatePackage" android:authorities="cn.qingji.diary.updates" android:exported="false" android:grantUriPermissions="true"/>
+    <activity android:name=".MainActivity" android:configChanges="orientation|screenSize|keyboardHidden" android:exported="true">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity>
+  </application>
+</manifest>

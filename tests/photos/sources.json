@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/Anduin2017/HowToCook",
+  "commit": "308cc8b7dab1da84b20e7fafdf836a715437f582",
+  "photos": {
+    "kung-pao.jpg": "dishes/meat_dish/宫保鸡丁/宫保鸡丁.jpg",
+    "mapo-tofu.jpg": "dishes/meat_dish/麻婆豆腐/1.jpeg",
+    "braised-pork.jpg": "dishes/meat_dish/红烧肉/000.jpg"
+  },
+  "purpose": "offline recognition test fixtures; not bundled in production APK"
+}

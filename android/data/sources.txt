@@ -1,0 +1,12 @@
+中文菜谱营养参考
+EveryDay_Food，Jiayu Zheng，MIT License
+https://github.com/Jiayu-zheng1/EveryDay_Food
+固定版本 5bd6cad753f68105a77b0ffcca2757f65fd5899d
+1093 条中文食谱，每100克能量由每份热量和份量换算。宏量营养素来自原始 per100g 字段。
+这些是社区食谱估值，未按中国食物成分表逐条化验。实际配方、用油和熟重会改变数值。
+
+USDA FoodData Central SR Legacy，2018年数据集，公共领域
+https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip
+保留同时具备能量、蛋白质、碳水、脂肪的条目。全部数值按100克。
+英文原名保留用于审阅。中文常见菜优先搜索。
+识别结果仅生成候选；使用者确认菜名、参考配方和克重后才生成营养记录。
