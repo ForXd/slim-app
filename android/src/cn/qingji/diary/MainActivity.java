@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public final class MainActivity extends Activity {
-    final int ink=Color.rgb(63,44,34),accent=Color.rgb(158,65,40),paper=Color.rgb(250,245,236);
+    final int ink=Color.rgb(63,44,34),accent=Color.rgb(36,92,71),paper=Color.rgb(250,245,236);
     final ExecutorService worker=Executors.newSingleThreadExecutor();
     JournalStore store;
     ChallengeScreen challenges;
@@ -30,6 +30,8 @@ public final class MainActivity extends Activity {
     FoodDatabase foods;
     OfflineFood model;
     LinearLayout root,body,tabs;
+    ScrollView activeScroll;
+    final Map<String,Integer> scrollPositions=new HashMap<>();
     WebView migration;
     String selectedDate=JournalStore.today(),screen="今日";
     Bitmap photo;
@@ -78,9 +80,9 @@ public final class MainActivity extends Activity {
     Button button(LinearLayout parent,String label,Runnable action){
         Button b=new Button(this);b.setText(label);b.setAllCaps(false);b.setTextColor(accent);b.setMinHeight(dp(48));b.setTextSize(15);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setStateListAnimator(null);
         GradientDrawable surface=new GradientDrawable();surface.setColor(0xffefe2d2);surface.setCornerRadius(dp(12));
-        b.setBackground(new android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(0x229e4128),surface,null));
+        b.setBackground(new android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(0x22245c47),surface,null));
         LinearLayout.LayoutParams layout=new LinearLayout.LayoutParams(-1,-2);layout.setMargins(dp(3),dp(4),dp(3),dp(4));
-        parent.addView(b,layout);b.setOnClickListener(v->action.run());return b;
+        parent.addView(b,layout);b.setOnClickListener(v->{v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);action.run();});return b;
     }
     void horizontalButtons(LinearLayout parent,String a,Runnable aa,String b,Runnable bb){
         LinearLayout line=row(parent);Button x=button(line,a,aa),y=button(line,b,bb);
@@ -110,15 +112,24 @@ public final class MainActivity extends Activity {
     String n(double value){return new DecimalFormat("0.#").format(value);}
     void show(String which){
         if(isFinishing()||isDestroyed())return;
+        boolean pageChanged=!screen.equals(which);
+        if(activeScroll!=null)scrollPositions.put(screen,activeScroll.getScrollY());
+        if(body!=null)body.animate().cancel();
         screen=which;updateStatus=null;root.removeAllViews();
         LinearLayout header=column();root.addView(header);text(header,"歪脖树修炼笔记",23,true);text(header,which,14,false);
-        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));body=column();scroll.addView(body);
+        ScrollView scroll=new ScrollView(this);activeScroll=scroll;scroll.setSmoothScrollingEnabled(true);scroll.setFillViewport(true);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));body=column();scroll.addView(body);
         tabs=new LinearLayout(this);root.addView(tabs);
         for(String title:new String[]{"今日","食物库","百次","趋势","计划"}){
-            Button b=button(tabs,title,()->show(title));b.setLayoutParams(new LinearLayout.LayoutParams(0,dp(54),1));b.setTextSize(13);b.setTypeface(null,title.equals(which)?Typeface.BOLD:Typeface.NORMAL);
-            b.setBackgroundTintList(ColorStateList.valueOf(title.equals(which)?0xff9e4128:paper));b.setTextColor(title.equals(which)?Color.WHITE:ink);
+            Button b=button(tabs,title,()->{if(!screen.equals(title))show(title);});b.setLayoutParams(new LinearLayout.LayoutParams(0,dp(54),1));b.setTextSize(13);b.setTypeface(null,title.equals(which)?Typeface.BOLD:Typeface.NORMAL);
+            b.setBackgroundTintList(ColorStateList.valueOf(title.equals(which)?0xff245c47:paper));b.setTextColor(title.equals(which)?Color.WHITE:ink);
         }
         if(which.equals("今日"))home();else if(which.equals("食物库"))library(body,"",null);else if(which.equals("百次"))challenges.render();else if(which.equals("趋势"))charts();else plan();
+        int savedY=scrollPositions.containsKey(which)?scrollPositions.get(which):0;
+        scroll.post(()->scroll.scrollTo(0,savedY));
+        if(pageChanged&&android.animation.ValueAnimator.areAnimatorsEnabled()){
+            body.setAlpha(0);body.setTranslationY(dp(6));
+            body.animate().alpha(1).translationY(0).setDuration(180).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+        }
     }
     List<JSONObject> dayRows(String day){List<JSONObject> out=new ArrayList<>();for(JSONObject r:store.sorted())if(r.optString("date").equals(day))out.add(r);return out;}
     void home(){

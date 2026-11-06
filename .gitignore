@@ -27,3 +27,7 @@ preview*.jpg
 design-qa.md
 scripts/*.mjs
 tests/*.ts
+
+/tsconfig.json
+/tests/runtime-fixture.*
+/tests/sites-worker.test.mjs

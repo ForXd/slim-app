@@ -27,6 +27,11 @@ public final class FeatureCheck extends Instrumentation {
   meta.put("url","https://evil.example/app.apk");rejects(()->AppUpdater.parse(meta.toString()));
   meta.put("url",AppUpdater.ROOT+"/download/v0.5.0/qingji-0.5.0.apk").put("bytes",AppUpdater.MAX_APK+1);rejects(()->AppUpdater.parse(meta.toString()));
   check(!AppUpdater.allowed(new URL("http://github.com/a")),"cleartext");check(!AppUpdater.allowed(new URL("https://github.com.evil.example/a")),"host spoof");check(!AppUpdater.allowed(new URL("https://user@github.com/a")),"userinfo");
-  out.putString("result","PASS: challenge 100 cells, repeated edit, timestamps, undo, archive, reopen, persistence, invalid input; update manifest and URL restrictions");finish(Activity.RESULT_OK,out);
+  AppUpdater updater=AppUpdater.get(getTargetContext());java.io.File installed=new java.io.File(getTargetContext().getApplicationInfo().sourceDir);
+  AppUpdater.Release same=new AppUpdater.Release(updater.currentVersion(),updater.currentCode(),"",installed.length(),AppUpdater.digest(installed),"");
+  rejects(()->updater.verify(installed,same));
+  AppUpdater.Release tampered=new AppUpdater.Release("9.0.0",999,"",installed.length(),new String(new char[64]).replace('\0','0'),"");
+  rejects(()->updater.verify(installed,tampered));
+  out.putString("result","PASS: challenge 100 cells, repeated edit, timestamps, undo, archive, reopen, persistence, invalid input; update manifest, URL restrictions, downgrade and hash rejection");finish(Activity.RESULT_OK,out);
  }catch(Throwable e){out.putString("result",android.util.Log.getStackTraceString(e));finish(Activity.RESULT_CANCELED,out);}}
 }

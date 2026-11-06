@@ -35,7 +35,7 @@ final class ChallengeScreen {
             app.text(card,active.getString("title"),21,true);
             int count=active.getJSONObject("cells").length();
             app.text(card,count+" / 100"+(count==100?" · 挑战完成！":""),30,true);
-            ProgressBar progress=new ProgressBar(app,null,android.R.attr.progressBarStyleHorizontal);progress.setMax(100);progress.setProgress(count);progress.setProgressTintList(ColorStateList.valueOf(app.accent));card.addView(progress);
+            ProgressBar progress=new ProgressBar(app,null,android.R.attr.progressBarStyleHorizontal);progress.setMax(100);progress.setProgress(count,android.animation.ValueAnimator.areAnimatorsEnabled());progress.setProgressTintList(ColorStateList.valueOf(app.accent));card.addView(progress);
             app.text(card,archived?"已归档，可重新开启继续记录。":"点击格子补打、修改备注或撤销。",13,false);
             JSONObject cells=active.getJSONObject("cells");
             for(int row=0;row<10;row++){

@@ -24,7 +24,7 @@ done
 unzip -qo android/deps/tensorflow-lite.aar 'jni/*' -d "$stage"
 mv "$stage/jni" "$stage/lib"
 unzip -p android/deps/tensorflow-lite.aar LICENSE > "$stage/assets/TensorFlow-LICENSE.txt"
-"$bt/aapt" package -f -M "$stage/AndroidManifest.xml" -I "$platform" -A "$stage/assets" -F "$stage/base.apk"
+"$bt/aapt" package -f -M "$stage/AndroidManifest.xml" -I "$platform" -S android/res -A "$stage/assets" -F "$stage/base.apk"
 "$JAVA_HOME/bin/javac" --release 8 -classpath "$platform:$stage/tensorflow-lite.jar:$stage/tensorflow-lite-api.jar" -d "$stage/classes" android/src/cn/qingji/diary/*.java
 (cd "$stage/classes" && "$JAVA_HOME/bin/jar" cf "$stage/app.jar" .)
 "$bt/d8" --lib "$platform" --min-api 28 --output "$stage/dex" "$stage/app.jar" "$stage/tensorflow-lite.jar" "$stage/tensorflow-lite-api.jar"

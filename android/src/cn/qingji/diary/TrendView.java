@@ -18,7 +18,7 @@ final class TrendView extends View {
         Float lastX=null,lastY=null;
         for(int i=0;i<values.size();i++){
             Double v=values.get(i);if(v==null){lastX=lastY=null;continue;}
-            float x=left+(right-left)*i/(values.size()-1),y=bottom-(float)((v-low)/(high-low))*(bottom-top);p.setColor(0xff9e4128);p.setStrokeWidth(2*density);
+            float x=left+(right-left)*i/(values.size()-1),y=bottom-(float)((v-low)/(high-low))*(bottom-top);p.setColor(0xff245c47);p.setStrokeWidth(2*density);
             if(weight){if(lastX!=null)c.drawLine(lastX,lastY,x,y,p);c.drawCircle(x,y,3*density,p);}
             else {float width=(right-left)/values.size()*.65f;c.drawRoundRect(x-width/2,y,x+width/2,Math.max(y+2,bottom),3,3,p);}
             lastX=x;lastY=y;
