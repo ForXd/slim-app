@@ -28,7 +28,16 @@ final class HomeScreen {
         View rule=new View(a);rule.setBackgroundColor(0xffd9b39a);LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(0,a.dp(1),1);rp.setMargins(a.dp(12),0,a.dp(8),0);heading.addView(rule,rp);
         Button all=a.button(heading,"日历回顾",a::history);all.setBackground(s.ripple(Color.TRANSPARENT,8,false));all.setTextSize(13);all.setPadding(0,0,0,0);all.setLayoutParams(new LinearLayout.LayoutParams(a.dp(76*Math.max(1,a.getResources().getConfiguration().fontScale)),a.dp(44)));all.setCompoundDrawables(null,null,s.icon("chevron_right",a.accent,16),null);
         for(int i=0;i<a.groups.length;i++)timeline(a.groups[i],i,meals);
-        for(JSONObject r:day)if(r.optString("kind").equals("exercise")||r.optString("kind").equals("weight"))a.entry(body,r);
+        boolean shownWeight=false;int weightCount=0;
+        for(JSONObject r:day)if(r.optString("kind").equals("weight"))weightCount++;
+        for(JSONObject r:day){
+            if(r.optString("kind").equals("exercise"))a.entry(body,r);
+            else if(r.optString("kind").equals("weight")&&!shownWeight){a.entry(body,r);shownWeight=true;}
+        }
+        if(weightCount>1)a.button(body,"查看当日全部体重（"+weightCount+"条）",()->{
+            LinearLayout list=a.column();for(JSONObject r:day)if(r.optString("kind").equals("weight"))a.entry(list,r);
+            a.dialog("当日体重记录",list);
+        });
     }
     void hero(){
         float fontScale=Math.max(1,a.getResources().getConfiguration().fontScale);

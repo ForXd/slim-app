@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: same-day weight upsert, other dates and multiple meals preserved
+INSTRUMENTATION_CODE: -1

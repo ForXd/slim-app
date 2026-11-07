@@ -23,6 +23,9 @@ final class JournalStore {
         if(!prefs.edit().putString("records",records.toString()).putString("plan",plan).putBoolean("migrated",true).commit())throw new Exception("保存迁移数据失败");
     }
     void save(JSONObject row) throws Exception{
+        if(!row.has("id")&&row.optString("kind").equals("weight")){
+            for(JSONObject old:sorted())if(old.optString("kind").equals("weight")&&old.optString("date").equals(row.optString("date"))){row.put("id",old.getString("id"));break;}
+        }
         if(!row.has("id"))row.put("id",System.currentTimeMillis()+"-"+UUID.randomUUID());
         JSONArray before=rows(),after=new JSONArray();
         for(int i=0;i<before.length();i++){JSONObject old=before.getJSONObject(i);if(!old.optString("id").equals(row.getString("id")))after.put(old);}

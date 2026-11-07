@@ -8,4 +8,5 @@
  <instrumentation android:name="cn.qingji.diary.TrendCheck" android:targetPackage="cn.qingji.diary"/>
  <instrumentation android:name="cn.qingji.diary.RevisionCheck" android:targetPackage="cn.qingji.diary"/>
  <instrumentation android:name="cn.qingji.diary.EnergyCheck" android:targetPackage="cn.qingji.diary"/>
+<instrumentation android:name="cn.qingji.diary.WeightCheck" android:targetPackage="cn.qingji.diary"/>
 </manifest>

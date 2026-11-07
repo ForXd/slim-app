@@ -152,7 +152,8 @@ public final class MainActivity extends Activity {
         String kind=r.optString("kind");LinearLayout c=card(parent);
         text(c,kind.equals("meal")?r.optString("food"):kind.equals("weight")?"体重 "+r.optString("kg")+" kg":r.optString("sport"),17,true);
         String detail=kind.equals("meal")?r.optString("portion")+" · "+(JournalStore.known(r,"kcal")?n(r.optDouble("kcal"))+" 千卡":"热量待补"):kind.equals("exercise")?r.optString("minutes")+" 分钟 · "+r.optString("burn")+" 千卡":"";
-        text(c,detail,14,false);
+        if(!detail.isEmpty())text(c,detail,14,false);
+        if(!kind.equals("meal")){button(c,"修改记录",()->edit(r));return;}
         horizontalButtons(c,kind.equals("meal")?"再吃一次":"查看 / 修改",()->{if(kind.equals("meal")){JSONObject copy=copy(r);copy.remove("id");put(copy,"date",selectedDate);meal(copy);}else edit(r);},"修改",()->edit(r));
     }
     JSONObject copy(JSONObject object){try{return new JSONObject(object.toString());}catch(Exception e){return new JSONObject();}}

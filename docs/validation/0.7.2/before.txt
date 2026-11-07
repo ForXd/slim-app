@@ -1,0 +1,5 @@
+INSTRUMENTATION_RESULT: result=java.lang.AssertionError: same-day weight duplicated: 2
+	at cn.qingji.diary.WeightCheck.onStart(WeightCheck.java:10)
+	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2637)
+
+INSTRUMENTATION_CODE: 0
