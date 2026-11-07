@@ -10,3 +10,5 @@ https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-0
 保留同时具备能量、蛋白质、碳水、脂肪的条目。全部数值按100克。
 英文原名保留用于审阅。中文常见菜优先搜索。
 识别结果仅生成候选；使用者确认菜名、参考配方和克重后才生成营养记录。
+
+0.7.1：37种水果中文名称映射见 scripts/localize-fruits.py。沿用上述 USDA 原始 FDC ID、能量与宏量营养，不新增推测数值；每100克可食部。同类品种映射明确标为参考。

@@ -25,3 +25,7 @@ db.commit()
 print(db.execute('select priority,count(*) from foods group by priority').fetchall())
 db.execute('VACUUM')
 db.close()
+
+# Apply the maintained Chinese fruit catalogue after every rebuild.
+import runpy
+runpy.run_path(str(__import__("pathlib").Path(__file__).with_name("localize-fruits.py")))["apply"](destination)
