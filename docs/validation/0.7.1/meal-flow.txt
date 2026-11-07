@@ -1,0 +1,1 @@
+PASS: isolated emulator UI searched rice and banana, selected database candidates, changed grams to 1200 and observed rice 1560 kcal, saved two breakfast items through continue-add. NativeCheck PASS.

@@ -77,6 +77,7 @@ final class HomeScreen {
         if(matching.isEmpty()){
             Button empty=a.button(content,"未记录",()->{JSONObject r=new JSONObject();MainActivity.put(r,"group",group);a.meal(r);});empty.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);empty.setTextColor(s.muted);empty.setBackground(s.ripple(Color.TRANSPARENT,6,false));empty.setCompoundDrawables(null,null,s.icon("plus",0xffb79b83,17),null);empty.setLayoutParams(new LinearLayout.LayoutParams(-1,a.dp(53)));empty.setContentDescription("添加"+group);
         }else for(JSONObject r:matching)mealCard(content,r);
+        if(!matching.isEmpty())a.button(content,"＋ 继续添加"+group,()->{JSONObject r=new JSONObject();MainActivity.put(r,"group",group);a.meal(r);});
         s.line(content);
     }
     void mealCard(LinearLayout parent,JSONObject r){

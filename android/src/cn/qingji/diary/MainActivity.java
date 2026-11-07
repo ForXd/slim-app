@@ -188,11 +188,33 @@ public final class MainActivity extends Activity {
         if(!record.optString("photo").isEmpty()){ImageView image=new ImageView(this);image.setScaleType(ImageView.ScaleType.CENTER_CROP);form.addView(image,new LinearLayout.LayoutParams(-1,dp(130)));loadMealPhoto(image,record.optString("photo"));}
         Spinner group=spinner(form,"餐次",groups,Arrays.asList(groups).indexOf(record.optString("group","午餐")));
         EditText name=input(form,"吃了什么",record.optString("food"),false),portion=input(form,"份量",record.optString("portion"),false);
-        if(record.has("source"))text(form,record.optString("source"),12,false);
+        LinearLayout suggestions=column();form.addView(suggestions);
+        EditText grams=input(form,"食物库份量（克）","100",true);
+        TextView reference=text(form,record.optString("source"),12,false);
         EditText kcal=input(form,"能量（千卡，可留空）",record.optString("kcal"),true);
         EditText protein=input(form,"蛋白质（克，可留空）",record.optString("protein"),true),carbs=input(form,"碳水（克，可留空）",record.optString("carbs"),true),fat=input(form,"脂肪（克，可留空）",record.optString("fat"),true);
+        final JSONObject[] selected={null};final boolean[] filling={false};
+        Runnable calculate=()->{if(selected[0]==null)return;try{
+            double g=Double.parseDouble(grams.getText().toString());if(!Double.isFinite(g)||g<=0||g>3000)throw new Exception();
+            EditText[] fields={kcal,protein,carbs,fat};String[] keys={"kcal","protein","carbs","fat"};
+            for(int i=0;i<4;i++)fields[i].setText(n(Math.round(selected[0].optDouble(keys[i])*g)/100.0));
+            portion.setText(n(g)+" 克");grams.setError(null);
+        }catch(Exception e){grams.setError("请输入 1–3000 克");for(EditText f:new EditText[]{kcal,protein,carbs,fat})f.setText("");}};
+        Handler lookupHandler=new Handler(Looper.getMainLooper());
+        Runnable lookup=()->{suggestions.removeAllViews();String q=name.getText().toString().trim();if(q.isEmpty())return;
+            int count=0;for(JSONObject item:foods.search(q)){if(count++==5)break;
+                Button b=button(suggestions,item.optString("name")+" · "+n(item.optDouble("kcal"))+" 千卡/100克",()->{
+                    selected[0]=item;filling[0]=true;name.setText(item.optString("name"));filling[0]=false;
+                    suggestions.removeAllViews();put(draft,"source",item.optString("source")+" · "+item.optString("id"));reference.setText(draft.optString("source"));calculate.run();
+                });b.setTextSize(13);
+            }
+        };
+        name.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){if(filling[0])return;selected[0]=null;draft.remove("source");reference.setText("");lookupHandler.removeCallbacks(lookup);lookupHandler.postDelayed(lookup,180);}});
+        grams.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){calculate.run();}});
         AlertDialog d=dialog(record.has("id")?"修改饮食":"核对饮食记录",form);
+        d.setOnDismissListener(v->lookupHandler.removeCallbacks(lookup));
         button(form,"保存记录",()->{try{
+            if(selected[0]!=null)number(grams,1,3000);
             if(name.getText().toString().trim().isEmpty()){name.setError("请填写菜名");return;}
             put(draft,"food",name.getText().toString().trim());put(draft,"portion",portion.getText().toString());put(draft,"group",group.getSelectedItem());
             EditText[] fields={kcal,protein,carbs,fat};String[] keys={"kcal","protein","carbs","fat"};double[] limits={15000,1000,2000,1000};
@@ -227,7 +249,7 @@ public final class MainActivity extends Activity {
             list.removeAllViews();List<JSONObject> results=foods.search(query.getText().toString());
             text(list,results.isEmpty()?"没有匹配条目，可手动记录。":"显示 "+Math.min(30,results.size())+" 条"+(results.size()>30?"，可继续输入缩小范围":""),12,false);
             int visible=0;for(JSONObject item:results){if(visible++>=30){text(list,"继续输入菜名可缩小结果范围",12,false);break;}
-                Button b=button(list,item.optString("name")+"\n"+n(item.optDouble("kcal"))+" 千卡/100克 · "+(item.optInt("priority")==0?"食谱估值":"USDA"),()->{if(owner!=null)owner.dismiss();portion(item,photoPath);});b.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);b.setTextSize(14);
+                Button b=button(list,item.optString("name")+"\n"+n(item.optDouble("kcal"))+" 千卡/100克 · "+(item.optString("id").startsWith("fdc:")?"USDA":"食谱估值"),()->{if(owner!=null)owner.dismiss();portion(item,photoPath);});b.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);b.setTextSize(14);
             }
             button(list,"手动填写餐食",()->{if(owner!=null)owner.dismiss();JSONObject r=new JSONObject();if(!photoPath.isEmpty())put(r,"photo",photoPath);meal(r);});
         };

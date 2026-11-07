@@ -11,9 +11,9 @@ final class FoodDatabase {
     final SQLiteDatabase db;
     final JSONObject aliases;
     FoodDatabase(Context context) throws Exception {
-        File file=new File(context.getFilesDir(),"foods-v5.sqlite");
+        File file=new File(context.getFilesDir(),"foods-v6.sqlite");
         if(!file.exists()){
-            File temp=new File(context.getFilesDir(),"foods-v5.tmp");
+            File temp=new File(context.getFilesDir(),"foods-v6.tmp");
             try(InputStream in=context.getAssets().open("foods.sqlite");OutputStream out=new FileOutputStream(temp)){
                 byte[] buffer=new byte[65536];int n;
                 while((n=in.read(buffer))!=-1)out.write(buffer,0,n);
