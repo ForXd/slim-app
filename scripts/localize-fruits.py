@@ -6,5 +6,6 @@ def apply(path):
  for id,name in mapping.items():
   row=c.execute('select english from foods where id=?',('fdc:'+id,)).fetchone();assert row,id
   c.execute('update foods set name=?,priority=0,ingredients=? where id=?',(name,'水果；每100克可食部，不含果皮果核等不可食部分。品种和成熟度会影响营养值；带“参考”的名称使用同类水果数据。','fdc:'+id))
+ c.execute("update foods set name='米饭（熟白米饭）',priority=0,ingredients='主食；每100克熟米饭可食部，不是生米。含水量会影响热量。' where id='fdc:168930'")
  c.commit();assert c.execute('pragma integrity_check').fetchone()[0]=='ok';c.close()
 if __name__=='__main__':apply(pathlib.Path(__file__).resolve().parents[1]/'android/data/foods.sqlite');print('PASS:',len(mapping),'Chinese fruit entries')
