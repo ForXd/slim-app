@@ -44,8 +44,6 @@ public final class MainActivity extends Activity {
     int chartDays=7;
     String chartMetric="kcal";
     final String[] groups={"早餐","午餐","晚餐","加餐"};
-    final String[] sports={"平地中速步行","轻松骑车","平地慢走"};
-    final double[] mets={3.8,4,2.8};
     final String[] planNames={"维持与观察","温和减量","标准减量","自定义目标"};
 
     @Override public void onCreate(Bundle saved){
@@ -231,13 +229,37 @@ public final class MainActivity extends Activity {
     }
     void exercise(JSONObject record){
         JSONObject draft=copy(record);put(draft,"kind","exercise");LinearLayout form=column();dateField(form,record,draft);
-        Spinner sport=spinner(form,"运动项目",sports,(record.optString("sport").startsWith("轻松骑车")?1:Arrays.asList(sports).indexOf(record.optString("sport"))));
+        int initial=record.has("sport")?ExerciseCatalog.index(record.optString("sport")):0;
+        Spinner sport=spinner(form,"运动项目",ExerciseCatalog.NAMES,initial);
+        EditText custom=input(form,"自定义名称",initial==ExerciseCatalog.NAMES.length-1?record.optString("sport",""):"",false);
+        custom.setVisibility(initial==ExerciseCatalog.NAMES.length-1?View.VISIBLE:View.GONE);
         EditText minutes=input(form,"时长（分钟）",record.optString("minutes"),true);
         String latest="";for(JSONObject r:store.sorted())if(r.optString("kind").equals("weight")){latest=r.optString("kg");break;}
         EditText kg=input(form,"运动时体重（kg）",record.optString("kg",latest),true);
-        text(form,"MET 参考成人活动汇编。按 (MET−1) × 3.5 × 体重 ÷ 200 × 分钟计算额外消耗，扣除同时间静息消耗。只记日常维持热量以外的专项运动。",13,false);
-        AlertDialog d=dialog("记录运动",form);button(form,"保存运动",()->{try{
-            double duration=number(minutes,1,1440),mass=number(kg,1,600);put(draft,"minutes",duration);put(draft,"kg",mass);put(draft,"sport",sport.getSelectedItem());put(draft,"burn",Math.round((mets[sport.getSelectedItemPosition()]-1)*3.5*mass/200*duration));save(draft,d);
+        EditText met=input(form,"运动强度 MET（可修改）",record.optString("met",n(ExerciseCatalog.MET[initial])),true);
+        TextView reference=text(form,"",13,false),preview=text(form,"填写时长与体重后估算",17,true);
+        Switch manual=new Switch(this);manual.setText("手动填写额外消耗");manual.setChecked(record.has("id"));form.addView(manual);
+        EditText burn=input(form,"额外消耗（千卡）",record.optString("burn"),true);burn.setEnabled(manual.isChecked());
+        Runnable calculate=()->{try{
+            long value=ExerciseCatalog.estimate(Double.parseDouble(met.getText().toString()),Double.parseDouble(kg.getText().toString()),Double.parseDouble(minutes.getText().toString()));
+            preview.setText("参考额外消耗 · "+value+" 千卡");if(!manual.isChecked())burn.setText(String.valueOf(value));
+        }catch(Exception e){preview.setText("填写有效的强度、体重和时长后估算");if(!manual.isChecked())burn.setText("");}};
+        TextWatcher watcher=new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){calculate.run();}};
+        minutes.addTextChangedListener(watcher);kg.addTextChangedListener(watcher);met.addTextChangedListener(watcher);
+        manual.setOnCheckedChangeListener((v,on)->{burn.setEnabled(on);calculate.run();});
+        reference.setText("2024 成人活动汇编 · "+ExerciseCatalog.CODES[initial]+" · 参考 MET "+n(ExerciseCatalog.MET[initial]));
+        sport.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){int previous=initial;
+            public void onNothingSelected(AdapterView<?> p){}
+            public void onItemSelected(AdapterView<?> p,View v,int pos,long id){custom.setVisibility(pos==ExerciseCatalog.NAMES.length-1?View.VISIBLE:View.GONE);reference.setText("2024 成人活动汇编 · "+ExerciseCatalog.CODES[pos]+" · 参考 MET "+n(ExerciseCatalog.MET[pos]));if(pos!=previous){previous=pos;met.setText(n(ExerciseCatalog.MET[pos]));}calculate.run();}
+        });
+        text(form,"按 (MET−1) × 3.5 × 体重 ÷ 200 × 分钟估算，已扣除静息消耗。手动值请填运动额外消耗；仅记录日常活动以外的运动。参考值主要适用于19–59岁成人。",12,false);
+        button(form,"参考值来源",()->{try{startActivity(new Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://pacompendium.com/adult-compendium/")));}catch(Exception e){toast("无法打开浏览器");}});
+        AlertDialog d=dialog("记录运动",form);calculate.run();button(form,"保存运动",()->{try{
+            double duration=number(minutes,1,1440),mass=number(kg,1,600),intensity=number(met,1,25);
+            String name=sport.getSelectedItemPosition()==ExerciseCatalog.NAMES.length-1?custom.getText().toString().trim():sport.getSelectedItem().toString();
+            if(name.isEmpty()){custom.setError("请填写运动名称");return;}
+            double energy=manual.isChecked()?number(burn,0,50000):ExerciseCatalog.estimate(intensity,mass,duration);
+            put(draft,"minutes",duration);put(draft,"kg",mass);put(draft,"sport",name);put(draft,"met",intensity);put(draft,"burnMode",manual.isChecked()?"manual":"estimate");put(draft,"burn",energy);save(draft,d);
         }catch(Exception e){toast(e.getMessage());}});deleteButton(form,record,d);
     }
     void library(LinearLayout parent,String initial,AlertDialog owner){library(parent,initial,owner,"");}

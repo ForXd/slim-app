@@ -1,0 +1,1 @@
+PASS: 60kg / 30min / 3.8 MET = 88 net kcal; manual 123 saved, displayed and preserved on reopening.

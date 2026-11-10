@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: 22 presets, custom fallback, net calculation and invalid inputs
+INSTRUMENTATION_CODE: -1
