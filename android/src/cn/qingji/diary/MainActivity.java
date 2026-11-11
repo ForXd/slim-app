@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public final class MainActivity extends Activity {
-    final int ink=Color.rgb(63,44,34),accent=Color.rgb(178,57,36),paper=Color.rgb(250,244,234);
+    int ink=Color.rgb(63,44,34),accent=Color.rgb(178,57,36),paper=Color.rgb(250,244,234);
     final ExecutorService worker=Executors.newSingleThreadExecutor();
     JournalStore store;
     JournalStyle style;
@@ -130,7 +130,7 @@ public final class MainActivity extends Activity {
         for(int i=0;i<tabNames.length;i++){
             final String title=tabNames[i];boolean active=title.equals(which);
             LinearLayout tab=new LinearLayout(this);tab.setOrientation(LinearLayout.VERTICAL);tab.setGravity(Gravity.CENTER);tabs.addView(tab,new LinearLayout.LayoutParams(0,dp(54),1));
-            tab.setBackground(style.ripple(active?0x12b23924:Color.TRANSPARENT,10,false));
+            tab.setBackground(style.ripple(active?(0x12000000|(accent&0xffffff)):Color.TRANSPARENT,10,false));
             tab.addView(style.image(icons[i],active?accent:style.muted,22),new LinearLayout.LayoutParams(dp(22),dp(22)));
             TextView caption=style.label(title,10,active,active?accent:style.muted);caption.setGravity(Gravity.CENTER);caption.setPadding(0,dp(4),0,0);tab.addView(caption);
             tab.setContentDescription(title);tab.setSelected(active);tab.setOnClickListener(v->{if(!screen.equals(title)){v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);show(title);}});
@@ -239,14 +239,17 @@ public final class MainActivity extends Activity {
         EditText met=input(form,"运动强度 MET（可修改）",record.optString("met",n(ExerciseCatalog.MET[initial])),true);
         TextView reference=text(form,"",13,false),preview=text(form,"填写时长与体重后估算",17,true);
         Switch manual=new Switch(this);manual.setText("手动填写额外消耗");manual.setChecked(record.has("id"));form.addView(manual);
-        EditText burn=input(form,"额外消耗（千卡）",record.optString("burn"),true);burn.setEnabled(manual.isChecked());
+        EditText burn=input(form,"额外消耗（千卡）",record.optString("burn"),true);burn.setEnabled(true);
+        final boolean[] updatingBurn={false};
         Runnable calculate=()->{try{
             long value=ExerciseCatalog.estimate(Double.parseDouble(met.getText().toString()),Double.parseDouble(kg.getText().toString()),Double.parseDouble(minutes.getText().toString()));
-            preview.setText("参考额外消耗 · "+value+" 千卡");if(!manual.isChecked())burn.setText(String.valueOf(value));
-        }catch(Exception e){preview.setText("填写有效的强度、体重和时长后估算");if(!manual.isChecked())burn.setText("");}};
+            preview.setText("参考额外消耗 · "+value+" 千卡");if(!manual.isChecked()){updatingBurn[0]=true;burn.setText(String.valueOf(value));updatingBurn[0]=false;}
+        }catch(Exception e){preview.setText("填写有效的强度、体重和时长后估算");if(!manual.isChecked()){updatingBurn[0]=true;burn.setText("");updatingBurn[0]=false;}}};
         TextWatcher watcher=new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){calculate.run();}};
         minutes.addTextChangedListener(watcher);kg.addTextChangedListener(watcher);met.addTextChangedListener(watcher);
-        manual.setOnCheckedChangeListener((v,on)->{burn.setEnabled(on);calculate.run();});
+        manual.setOnCheckedChangeListener((v,on)->calculate.run());
+        burn.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){if(!updatingBurn[0]&&!manual.isChecked())manual.setChecked(true);}});
+        button(form,"使用参考估算",()->{manual.setChecked(false);calculate.run();});
         reference.setText("2024 成人活动汇编 · "+ExerciseCatalog.CODES[initial]+" · 参考 MET "+n(ExerciseCatalog.MET[initial]));
         sport.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){int previous=initial;
             public void onNothingSelected(AdapterView<?> p){}

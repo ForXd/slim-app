@@ -25,7 +25,7 @@ final class HomeScreen {
         for(JSONObject r:day)if(r.optString("kind").equals("meal")){meals.add(r);groups.add(r.optString("group"));}
         summaries(groups.size());s.space(body,6);energy(day,meals);s.space(body,10);
         LinearLayout heading=a.row(body);TextView title=s.heading("饮食日记",22,a.ink);heading.addView(title);
-        View rule=new View(a);rule.setBackgroundColor(0xffd9b39a);LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(0,a.dp(1),1);rp.setMargins(a.dp(12),0,a.dp(8),0);heading.addView(rule,rp);
+        View rule=new View(a);rule.setBackgroundColor(s.line);LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(0,a.dp(1),1);rp.setMargins(a.dp(12),0,a.dp(8),0);heading.addView(rule,rp);
         Button all=a.button(heading,"日历回顾",a::history);all.setBackground(s.ripple(Color.TRANSPARENT,8,false));all.setTextSize(13);all.setPadding(0,0,0,0);all.setLayoutParams(new LinearLayout.LayoutParams(a.dp(76*Math.max(1,a.getResources().getConfiguration().fontScale)),a.dp(44)));all.setCompoundDrawables(null,null,s.icon("chevron_right",a.accent,16),null);
         for(int i=0;i<a.groups.length;i++)timeline(a.groups[i],i,meals);
         boolean shownWeight=false;int weightCount=0;
@@ -44,8 +44,8 @@ final class HomeScreen {
         FrameLayout hero=new FrameLayout(a);body.addView(hero,new LinearLayout.LayoutParams(-1,a.dp(130*fontScale)));
         ImageView branch=new ImageView(a);branch.setImageBitmap(s.branch);branch.setScaleType(ImageView.ScaleType.FIT_END);branch.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         FrameLayout.LayoutParams bp=new FrameLayout.LayoutParams(a.dp(146),a.dp(116),Gravity.TOP|Gravity.RIGHT);bp.rightMargin=-a.dp(14);bp.topMargin=-a.dp(2);hero.addView(branch,bp);
-        TextView brand=s.heading("靓女",32,0xff802917);FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-2,-2);p.topMargin=a.dp(9);hero.addView(brand,p);
-        TextView subtitle=s.label("修炼笔记",12,false,0xff92583f);subtitle.setLetterSpacing(.18f);p=new FrameLayout.LayoutParams(-2,-2);p.topMargin=a.dp(57*fontScale);p.leftMargin=a.dp(2);hero.addView(subtitle,p);
+        TextView brand=s.heading("靓女",32,a.accent);FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-2,-2);p.topMargin=a.dp(9);hero.addView(brand,p);
+        TextView subtitle=s.label("修炼笔记",12,false,s.muted);subtitle.setLetterSpacing(.18f);p=new FrameLayout.LayoutParams(-2,-2);p.topMargin=a.dp(57*fontScale);p.leftMargin=a.dp(2);hero.addView(subtitle,p);
         LinearLayout date=new LinearLayout(a);date.setGravity(Gravity.BOTTOM);p=new FrameLayout.LayoutParams(-2,a.dp(48*fontScale));p.topMargin=a.dp(82*fontScale);hero.addView(date,p);
         LocalDate day=LocalDate.parse(a.selectedDate);
         TextView value=s.heading(day.format(DateTimeFormatter.ofPattern("M月d日")),30,a.ink);date.addView(value);
@@ -79,7 +79,7 @@ final class HomeScreen {
         LinearLayout side=new LinearLayout(a);side.setOrientation(LinearLayout.HORIZONTAL);side.setPadding(0,a.dp(11),0,0);row.addView(side,new LinearLayout.LayoutParams(a.dp(64),-1));
         LinearLayout track=new LinearLayout(a);track.setOrientation(LinearLayout.VERTICAL);track.setGravity(Gravity.CENTER_HORIZONTAL);side.addView(track,new LinearLayout.LayoutParams(a.dp(11),-1));
         View dot=new View(a);android.graphics.drawable.GradientDrawable circle=new android.graphics.drawable.GradientDrawable();circle.setShape(android.graphics.drawable.GradientDrawable.OVAL);circle.setColor(matching.isEmpty()?a.paper:a.accent);circle.setStroke(1,matching.isEmpty()?0xffac8e78:a.accent);dot.setBackground(circle);LinearLayout.LayoutParams dotParams=new LinearLayout.LayoutParams(a.dp(7),a.dp(7));dotParams.topMargin=a.dp(6);track.addView(dot,dotParams);
-        if(index<a.groups.length-1){View rule=new View(a);rule.setBackgroundColor(0xffdec5af);LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(1,0,1);rp.topMargin=a.dp(3);track.addView(rule,rp);}
+        if(index<a.groups.length-1){View rule=new View(a);rule.setBackgroundColor(s.line);LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(1,0,1);rp.topMargin=a.dp(3);track.addView(rule,rp);}
         LinearLayout labels=new LinearLayout(a);labels.setOrientation(LinearLayout.VERTICAL);labels.setPadding(a.dp(4),0,0,0);side.addView(labels,new LinearLayout.LayoutParams(0,-2,1));
         TextView title=s.label(group,14,true,matching.isEmpty()?s.muted:a.accent);labels.addView(title);TextView hint=s.label(matching.isEmpty()?"待记录":matching.size()+"条记录",10,false,s.muted);labels.addView(hint);
         LinearLayout content=new LinearLayout(a);content.setOrientation(LinearLayout.VERTICAL);row.addView(content,new LinearLayout.LayoutParams(0,-2,1));
@@ -112,7 +112,7 @@ final class HomeScreen {
         for(JSONObject r:exercises)if(JournalStore.known(r,"burn"))knownBurn++;
         boolean hasTarget=Double.isFinite(target)&&target>0;
         boolean comparable=hasTarget&&known>0,over=comparable&&net>target;
-        int stateColor=comparable?(net<target?0xff65764c:a.accent):s.muted;
+        int stateColor=comparable?(net<target?0xff65764c:0xffb23924):s.muted;
 
         LinearLayout c=a.card(body);c.setPadding(a.dp(14),a.dp(8),a.dp(14),a.dp(10));
         c.setBackground(s.surface(0x88fffdf6,12,true));
@@ -143,8 +143,8 @@ final class HomeScreen {
         if(over){
             LinearLayout notice=new LinearLayout(a);notice.setOrientation(LinearLayout.VERTICAL);
             notice.setPadding(a.dp(10),a.dp(8),a.dp(10),a.dp(8));notice.setBackground(s.surface(0x18b23924,8,false));
-            notice.addView(s.label("超出 "+a.n(net-target)+" 千卡",15,true,a.accent));
-            notice.addView(s.label("记得动一动，运动后记录一下。",12,false,a.accent));
+            notice.addView(s.label("超出 "+a.n(net-target)+" 千卡",15,true,0xffb23924));
+            notice.addView(s.label("记得动一动，运动后记录一下。",12,false,0xffb23924));
             c.addView(notice,new LinearLayout.LayoutParams(-1,-2));
         }else{
             String status=!hasTarget?"设置每日目标后查看进度":known==0?(meals.isEmpty()?"记录饮食后查看进度":"等待补全热量"):
@@ -166,7 +166,7 @@ final class HomeScreen {
         exercise.setMinWidth(0);exercise.setMinimumWidth(0);exercise.setPadding(a.dp(10),a.dp(8),a.dp(10),a.dp(8));
         exercise.setLayoutParams(new LinearLayout.LayoutParams(-2,-2));exercise.setCompoundDrawablePadding(a.dp(4));
         exercise.setCompoundDrawables(s.icon("run",over?Color.WHITE:a.accent,20),null,null,null);
-        if(over){exercise.setBackground(s.ripple(a.accent,10,false));exercise.setTextColor(Color.WHITE);}
+        if(over){exercise.setBackground(s.ripple(0xffb23924,10,false));exercise.setTextColor(Color.WHITE);}
 
         StringBuilder macros=new StringBuilder();
         for(String key:new String[]{"protein","carbs","fat"}){

@@ -71,9 +71,9 @@ final class TrendView extends View {
             Float previousX=null,previousY=null;
             for(int i=0;i<count;i++){
                 Double value=series.points.get(i).value;if(value==null){previousX=previousY=null;continue;}
-                float x=x(i,step),y=y(value);paint.setColor(0xffb23924);paint.setStrokeWidth(dp(2.2f));
+                float x=x(i,step),y=y(value);paint.setColor(((MainActivity)getContext()).accent);paint.setStrokeWidth(dp(2.2f));
                 if(previousX!=null)canvas.drawLine(previousX,previousY,x,y,paint);
-                paint.setColor(i==selected?0xffb23924:0xffc9775d);canvas.drawCircle(x,y,dp(i==selected?4.5f:3),paint);
+                paint.setColor(i==selected?((MainActivity)getContext()).accent:((MainActivity)getContext()).accent);canvas.drawCircle(x,y,dp(i==selected?4.5f:3),paint);
                 if(i==selected){paint.setColor(0xfffff8ee);canvas.drawCircle(x,y,dp(1.6f),paint);}
                 previousX=x;previousY=y;
             }
@@ -81,7 +81,7 @@ final class TrendView extends View {
             float bar=Math.min(dp(22),Math.max(dp(2),step*.58f));
             for(int i=0;i<count;i++){
                 TrendSeries.Point p=series.points.get(i);if(p.value==null)continue;
-                float x=x(i,step),y=Math.min(bottom-dp(2),y(p.value));paint.setColor(i==selected?0xffb23924:0xffd99a85);
+                float x=x(i,step),y=Math.min(bottom-dp(2),y(p.value));paint.setColor(i==selected?((MainActivity)getContext()).accent:(0x88000000|(((MainActivity)getContext()).accent&0xffffff)));
                 canvas.drawRoundRect(x-bar/2,y,x+bar/2,bottom,dp(3),dp(3),paint);
                 if(p.partial){paint.setColor(0xff826955);paint.setTextAlign(Paint.Align.CENTER);canvas.drawText("*",x,Math.max(top-dp(5),y-dp(3)),paint);}
             }

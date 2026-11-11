@@ -10,4 +10,5 @@
  <instrumentation android:name="cn.qingji.diary.EnergyCheck" android:targetPackage="cn.qingji.diary"/>
 <instrumentation android:name="cn.qingji.diary.WeightCheck" android:targetPackage="cn.qingji.diary"/>
 <instrumentation android:name="cn.qingji.diary.ExerciseCheck" android:targetPackage="cn.qingji.diary"/>
+<instrumentation android:name="cn.qingji.diary.SeasonColorCheck" android:targetPackage="cn.qingji.diary"/>
 </manifest>

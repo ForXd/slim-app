@@ -17,7 +17,7 @@ final class JournalStyle {
     final Bitmap paper;
     Bitmap branch;
     private String seasonKey="";
-    final int muted=0xff826955,line=0xffe4d4bf;
+    int muted=0xff826955,line=0xffe4d4bf;
     JournalStyle(MainActivity app){
         this.app=app;serif=Typeface.createFromAsset(app.getAssets(),"ui/journal-serif.otf");
         paper=asset("paper.png",2);refreshSeason();
@@ -26,7 +26,15 @@ final class JournalStyle {
         SeasonTheme season=SeasonTheme.resolve(app.preferences().getString("theme","auto"),java.time.LocalDate.now());
         if(season.key.equals(seasonKey))return false;
         Bitmap next=asset(season.asset,2);if(next==null)next=asset("tomato-branch.png",2);
-        branch=next;seasonKey=season.key;return true;
+        branch=next;seasonKey=season.key;
+        switch(season.key){
+            case "spring":app.accent=0xff436b45;app.paper=0xfff3f5e9;app.ink=0xff293b2c;muted=0xff63725b;line=0xffcfd9c6;break;
+            case "summer":app.accent=0xff246a78;app.paper=0xffeef6f4;app.ink=0xff263d43;muted=0xff5c7376;line=0xffc8dbdc;break;
+            case "winter":app.accent=0xff466584;app.paper=0xfff0f3f7;app.ink=0xff2e3a4a;muted=0xff647386;line=0xffd0d9e4;break;
+            default:app.accent=0xffb23924;app.paper=0xfffaf4ea;app.ink=0xff3f2c22;muted=0xff826955;line=0xffe4d4bf;
+        }
+        app.getWindow().setStatusBarColor(app.paper);app.getWindow().setNavigationBarColor(app.paper);
+        if(app.root!=null)app.root.setBackground(paper());return true;
     }
     Bitmap asset(String name,int sample){try(InputStream in=app.getAssets().open("ui/"+name)){BitmapFactory.Options o=new BitmapFactory.Options();o.inSampleSize=sample;return BitmapFactory.decodeStream(in,null,o);}catch(IOException e){return null;}}
     Drawable paper(){
@@ -35,7 +43,7 @@ final class JournalStyle {
         return new LayerDrawable(new Drawable[]{new ColorDrawable(app.paper),texture});
     }
     GradientDrawable surface(int color,int radius,boolean border){GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(app.dp(radius));if(border)d.setStroke(1,line);return d;}
-    Drawable ripple(int color,int radius,boolean border){return new RippleDrawable(ColorStateList.valueOf(0x22b23924),surface(color,radius,border),null);}
+    Drawable ripple(int color,int radius,boolean border){return new RippleDrawable(ColorStateList.valueOf(0x22000000|(app.accent&0xffffff)),surface(color,radius,border),null);}
     Drawable icon(String name,int color,int dp){
         int id=app.getResources().getIdentifier("ic_"+name,"drawable",app.getPackageName());
         Drawable d=app.getDrawable(id).mutate();d.setTint(color);d.setBounds(0,0,app.dp(dp),app.dp(dp));return d;

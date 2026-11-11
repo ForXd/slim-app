@@ -162,7 +162,7 @@ final class PlanScreen {
         boolean chosen=selected==mode;PlanMath.Choice choice=null;
         try{choice=PlanMath.choice(estimate,mode,mode==PlanMath.Mode.CUSTOM?Double.parseDouble(customText):0);}catch(Exception ignored){}
         LinearLayout card=new LinearLayout(a);card.setOrientation(LinearLayout.VERTICAL);card.setPadding(a.dp(10),a.dp(10),a.dp(10),a.dp(10));
-        card.setBackground(style.ripple(chosen?0x20b23924:0x55ffffff,10,true));
+        card.setBackground(style.ripple(chosen?(0x20000000|(a.accent&0xffffff)):0x55ffffff,10,true));
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);p.setMargins(first?0:a.dp(4),a.dp(4),first?a.dp(4):0,a.dp(4));row.addView(card,p);
         card.addView(style.label(shortName(mode),14,true,chosen?a.accent:a.ink));
         card.addView(style.number(choice==null?"—":a.n(choice.target),24,chosen?a.accent:a.ink));
