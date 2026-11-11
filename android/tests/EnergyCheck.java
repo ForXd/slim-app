@@ -77,11 +77,17 @@ public final class EnergyCheck extends Instrumentation {
                     check(exercise.getCurrentTextColor()==Color.WHITE,"over-target exercise action not emphasized");
 
                     render(1200d,meal(1300d),new JSONObject().put("kind","exercise").put("burn",100));
-                    checkBar(1000,activity.accent,"exercise does not raise the intake allowance");
+                    checkBar(1000,activity.accent,"net intake reaches target");
                     checkText("全天消耗约 "+activity.n(1900)+" 千卡");
                     checkText("运动额外消耗 "+activity.n(100)+" 千卡");
                     checkText(" / "+activity.n(1200)+" 千卡");
-                    checkText("超出 "+activity.n(100)+" 千卡");
+                    checkText("已达今日目标");
+                    checkNoPrefix("超出 ");
+                    render(1200d,meal(1300d),new JSONObject().put("kind","exercise").put("burn",300));
+                    checkBar(833,BELOW_TARGET,"exercise deducted from net intake");
+                    checkText("还可摄入 "+activity.n(200)+" 千卡");
+                    render(1200d,meal(100d),new JSONObject().put("kind","exercise").put("burn",300));
+                    checkBar(0,BELOW_TARGET,"negative net clamps only bar");checkText(activity.n(-200));
 
                     render(1200d,meal(null));
                     checkBar(0,activity.style.muted,"unknown calories");
@@ -119,7 +125,7 @@ public final class EnergyCheck extends Instrumentation {
                     check(originalStore.prefs.getAll().equals(originalPreferences),"real journal preferences changed during the check");
                 }
             });
-            result.putString("result","PASS: real native energy-card progress/tints/text for below, exact and over target; exercise increases expenditure without changing allowance; unknown, empty, no-target and explicit-zero states; isolated plan data cleaned and original store/body restored");
+            result.putString("result","PASS: real native energy-card progress/tints/text for below, exact and over target; exercise deducted from net intake and remaining allowance; negative net supported; unknown, empty, no-target and explicit-zero states; isolated plan data cleaned and original store/body restored");
         }catch(Throwable error){failure=error;}
         if(failure!=null)result.putString("result",android.util.Log.getStackTraceString(failure));
         finish(failure==null?Activity.RESULT_OK:Activity.RESULT_CANCELED,result);

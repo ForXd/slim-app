@@ -105,13 +105,14 @@ final class HomeScreen {
     }
     void energy(List<JSONObject> day,List<JSONObject> meals){
         double intake=JournalStore.sum(meals,"kcal"),target=a.store.plan().optDouble("target",0);
-        double burn=JournalStore.sum(day,"burn"),base=a.store.plan().optDouble("base",0);
+        List<JSONObject> exercises=new ArrayList<>();for(JSONObject row:day)if(row.optString("kind").equals("exercise"))exercises.add(row);
+        double burn=JournalStore.sum(exercises,"burn"),net=intake-burn,base=a.store.plan().optDouble("base",0);
         int known=0,knownBurn=0;
         for(JSONObject r:meals)if(JournalStore.known(r,"kcal"))known++;
-        for(JSONObject r:day)if(JournalStore.known(r,"burn"))knownBurn++;
+        for(JSONObject r:exercises)if(JournalStore.known(r,"burn"))knownBurn++;
         boolean hasTarget=Double.isFinite(target)&&target>0;
-        boolean comparable=hasTarget&&known>0,over=comparable&&intake>target;
-        int stateColor=comparable?(intake<target?0xff65764c:a.accent):s.muted;
+        boolean comparable=hasTarget&&known>0,over=comparable&&net>target;
+        int stateColor=comparable?(net<target?0xff65764c:a.accent):s.muted;
 
         LinearLayout c=a.card(body);c.setPadding(a.dp(14),a.dp(8),a.dp(14),a.dp(10));
         c.setBackground(s.surface(0x88fffdf6,12,true));
@@ -121,30 +122,36 @@ final class HomeScreen {
         edit.setMinWidth(0);edit.setMinimumWidth(0);edit.setPadding(a.dp(8),0,0,0);
         edit.setBackground(s.ripple(Color.TRANSPARENT,6,false));edit.setLayoutParams(new LinearLayout.LayoutParams(-2,-2));
 
+        s.space(c,6);
+        LinearLayout breakdown=a.row(c);
+        breakdown.addView(s.label("饮食摄入  "+(known==0?"—":a.n(intake))+" 千卡",13,false,a.ink),new LinearLayout.LayoutParams(0,-2,1));
+        breakdown.addView(s.label("− 运动  "+a.n(burn)+" 千卡",13,true,0xff65764c),new LinearLayout.LayoutParams(0,-2,1));
+        s.space(c,8);c.addView(s.label("净摄入 · 饮食减运动",12,true,s.muted));
         LinearLayout numbers=a.row(c);numbers.setGravity(Gravity.BOTTOM);
-        TextView total=s.number(known==0?"—":a.n(intake),28,stateColor);numbers.addView(total);
+        TextView total=s.number(known==0?"—":a.n(net),28,stateColor);numbers.addView(total);
         TextView goal=s.label(hasTarget?" / "+a.n(target)+" 千卡":" 千卡 · 未设目标",14,false,s.muted);
         goal.setPadding(a.dp(4),0,0,a.dp(3));numbers.addView(goal,new LinearLayout.LayoutParams(0,-2,1));
         s.space(c,7);
         if(hasTarget){
             ProgressBar bar=new ProgressBar(a,null,android.R.attr.progressBarStyleHorizontal);
-            bar.setMax(1000);bar.setProgress(known==0?0:(int)Math.max(0,Math.min(1000,intake/target*1000)));
+            bar.setMax(1000);bar.setProgress(known==0?0:(int)Math.max(0,Math.min(1000,net/target*1000)));
             bar.setProgressTintList(ColorStateList.valueOf(stateColor));bar.setProgressBackgroundTintList(ColorStateList.valueOf(s.line));
-            bar.setContentDescription(known==0?"摄入热量待记录":"摄入 "+a.n(intake)+" 千卡，目标 "+a.n(target)+" 千卡");
+            bar.setContentDescription(known==0?"摄入热量待记录":"净摄入 "+a.n(net)+" 千卡，目标 "+a.n(target)+" 千卡");
             c.addView(bar,new LinearLayout.LayoutParams(-1,a.dp(8)));s.space(c,8);
         }
 
         if(over){
             LinearLayout notice=new LinearLayout(a);notice.setOrientation(LinearLayout.VERTICAL);
             notice.setPadding(a.dp(10),a.dp(8),a.dp(10),a.dp(8));notice.setBackground(s.surface(0x18b23924,8,false));
-            notice.addView(s.label("超出 "+a.n(intake-target)+" 千卡",15,true,a.accent));
+            notice.addView(s.label("超出 "+a.n(net-target)+" 千卡",15,true,a.accent));
             notice.addView(s.label("记得动一动，运动后记录一下。",12,false,a.accent));
             c.addView(notice,new LinearLayout.LayoutParams(-1,-2));
         }else{
             String status=!hasTarget?"设置每日目标后查看进度":known==0?(meals.isEmpty()?"记录饮食后查看进度":"等待补全热量"):
-                    intake<target?"还可摄入 "+a.n(target-intake)+" 千卡":"已达今日目标";
+                    net<target?"还可摄入 "+a.n(target-net)+" 千卡":"已达今日目标";
             c.addView(s.label(status,14,true,stateColor));
         }
+        if(knownBurn<exercises.size())c.addView(s.label("运动消耗待补，净摄入暂不完整",12,false,s.muted));
         if(known<meals.size()){
             TextView pending=s.label((meals.size()-known)+" 条热量待补，合计暂不完整",12,false,s.muted);
             pending.setPadding(0,a.dp(5),0,0);c.addView(pending);

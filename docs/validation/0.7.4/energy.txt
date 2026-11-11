@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: real native energy-card progress/tints/text for below, exact and over target; exercise deducted from net intake and remaining allowance; negative net supported; unknown, empty, no-target and explicit-zero states; isolated plan data cleaned and original store/body restored
+INSTRUMENTATION_CODE: -1
