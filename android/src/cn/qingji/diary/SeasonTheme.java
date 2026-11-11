@@ -21,9 +21,9 @@ final class SeasonTheme {
             case "winter":return WINTER;
             default:
                 int month=date.getMonthValue();
-                if(month>=3&&month<=5)return SPRING;
-                if(month>=6&&month<=8)return SUMMER;
-                if(month>=9&&month<=11)return AUTUMN;
+                if(month>=2&&month<=4)return SPRING;
+                if(month>=5&&month<=7)return SUMMER;
+                if(month>=8&&month<=10)return AUTUMN;
                 return WINTER;
         }
     }

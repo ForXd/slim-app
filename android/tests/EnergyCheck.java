@@ -62,22 +62,22 @@ public final class EnergyCheck extends Instrumentation {
                     checkNoText("已达今日目标");
 
                     render(1200d,meal(1200d));
-                    checkBar(1000,activity.accent,"exact target");
-                    checkColor(activity.n(1200),activity.accent,"at-target total");
-                    checkColor("已达今日目标",activity.accent,"at-target status");
+                    checkBar(1000,0xffb23924,"exact target");
+                    checkColor(activity.n(1200),0xffb23924,"at-target total");
+                    checkColor("已达今日目标",0xffb23924,"at-target status");
                     checkNoPrefix("超出 ");
 
                     render(1200d,meal(1300d));
-                    checkBar(1000,activity.accent,"over target");
-                    checkColor(activity.n(1300),activity.accent,"over-target total");
-                    checkColor("超出 "+activity.n(100)+" 千卡",activity.accent,"over-target amount");
+                    checkBar(1000,0xffb23924,"over target");
+                    checkColor(activity.n(1300),0xffb23924,"over-target total");
+                    checkColor("超出 "+activity.n(100)+" 千卡",0xffb23924,"over-target amount");
                     checkText("记得动一动，运动后记录一下。");
                     TextView exercise=checkText("记录运动");
                     check(exercise instanceof Button&&exercise.isEnabled()&&exercise.hasOnClickListeners(),"exercise action missing");
                     check(exercise.getCurrentTextColor()==Color.WHITE,"over-target exercise action not emphasized");
 
                     render(1200d,meal(1300d),new JSONObject().put("kind","exercise").put("burn",100));
-                    checkBar(1000,activity.accent,"net intake reaches target");
+                    checkBar(1000,0xffb23924,"net intake reaches target");
                     checkText("全天消耗约 "+activity.n(1900)+" 千卡");
                     checkText("运动额外消耗 "+activity.n(100)+" 千卡");
                     checkText(" / "+activity.n(1200)+" 千卡");

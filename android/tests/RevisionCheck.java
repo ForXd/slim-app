@@ -31,7 +31,8 @@ public final class RevisionCheck extends Instrumentation {
   check(JournalCalendar.canGoForward(YearMonth.from(today).minusMonths(1),today),"previous month navigation");
   String[] keys={"winter","spring","summer","autumn","winter"};int[] months={1,3,6,9,12};
   for(int i=0;i<months.length;i++)check(SeasonTheme.resolve("auto",LocalDate.of(2026,months[i],1)).key.equals(keys[i]),"season boundary "+months[i]);
-  check(SeasonTheme.resolve("winter",today).key.equals("winter"),"manual season wins");check(SeasonTheme.resolve("invalid",today).key.equals("autumn"),"invalid preference falls back");
+  check(SeasonTheme.resolve("winter",today).key.equals("winter"),"manual season wins");check(SeasonTheme.resolve("invalid",today).key.equals("winter"),"invalid preference falls back");
+  check(SeasonTheme.resolve("auto",LocalDate.of(2026,11,11)).key.equals("winter"),"November winter");
   out.putString("result","PASS: Mifflin estimate, actual preset deficit and floors, low BMI, custom below 1500, surplus, invalid inputs; leap calendar and future bounds; automatic/manual season boundaries");finish(Activity.RESULT_OK,out);
  }catch(Throwable e){out.putString("result",android.util.Log.getStackTraceString(e));finish(Activity.RESULT_CANCELED,out);}}
  interface Check{void run();}

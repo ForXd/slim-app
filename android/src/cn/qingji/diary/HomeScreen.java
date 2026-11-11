@@ -31,8 +31,7 @@ final class HomeScreen {
         boolean shownWeight=false;int weightCount=0;
         for(JSONObject r:day)if(r.optString("kind").equals("weight"))weightCount++;
         for(JSONObject r:day){
-            if(r.optString("kind").equals("exercise"))a.entry(body,r);
-            else if(r.optString("kind").equals("weight")&&!shownWeight){a.entry(body,r);shownWeight=true;}
+            if(r.optString("kind").equals("weight")&&!shownWeight){a.entry(body,r);shownWeight=true;}
         }
         if(weightCount>1)a.button(body,"查看当日全部体重（"+weightCount+"条）",()->{
             LinearLayout list=a.column();for(JSONObject r:day)if(r.optString("kind").equals("weight"))a.entry(list,r);
@@ -167,6 +166,12 @@ final class HomeScreen {
         exercise.setLayoutParams(new LinearLayout.LayoutParams(-2,-2));exercise.setCompoundDrawablePadding(a.dp(4));
         exercise.setCompoundDrawables(s.icon("run",over?Color.WHITE:a.accent,20),null,null,null);
         if(over){exercise.setBackground(s.ripple(0xffb23924,10,false));exercise.setTextColor(Color.WHITE);}
+
+        for(JSONObject item:exercises){
+            Button editExercise=a.button(c,item.optString("sport","运动")+" · "+a.n(item.optDouble("burn",0))+" 千卡  › 修改",()->a.exercise(item));
+            editExercise.setTextSize(13);editExercise.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);
+        }
+        consumption.setOnClickListener(v->{if(exercises.size()==1)a.exercise(exercises.get(0));else if(exercises.isEmpty())a.exercise(new JSONObject());});
 
         StringBuilder macros=new StringBuilder();
         for(String key:new String[]{"protein","carbs","fat"}){

@@ -1,0 +1,2 @@
+PASS: ExerciseCheck, RevisionCheck, EnergyCheck, SeasonColorCheck, TrendCheck on isolated emulator-5584.
+PASS UI: home energy card opens existing exercise; 60kg / 30min / 3km walking = 120 net kcal; manual 145 saved and preserved on reopening along with distance; fixed save visible.

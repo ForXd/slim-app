@@ -236,33 +236,35 @@ public final class MainActivity extends Activity {
         EditText minutes=input(form,"时长（分钟）",record.optString("minutes"),true);
         String latest="";for(JSONObject r:store.sorted())if(r.optString("kind").equals("weight")){latest=r.optString("kg");break;}
         EditText kg=input(form,"运动时体重（kg）",record.optString("kg",latest),true);
-        EditText met=input(form,"运动强度 MET（可修改）",record.optString("met",n(ExerciseCatalog.MET[initial])),true);
+        EditText distance=input(form,"距离（公里，选填）",record.optString("distanceKm"),true);
+        distance.setEnabled(ExerciseCatalog.distanceSport(initial));
         TextView reference=text(form,"",13,false),preview=text(form,"填写时长与体重后估算",17,true);
         Switch manual=new Switch(this);manual.setText("手动填写额外消耗");manual.setChecked(record.has("id"));form.addView(manual);
         EditText burn=input(form,"额外消耗（千卡）",record.optString("burn"),true);burn.setEnabled(true);
         final boolean[] updatingBurn={false};
         Runnable calculate=()->{try{
-            long value=ExerciseCatalog.estimate(Double.parseDouble(met.getText().toString()),Double.parseDouble(kg.getText().toString()),Double.parseDouble(minutes.getText().toString()));
+            long value=ExerciseCatalog.estimate(ExerciseCatalog.intensity(sport.getSelectedItemPosition(),distance.getText().toString().trim().isEmpty()?0:Double.parseDouble(distance.getText().toString()),Double.parseDouble(minutes.getText().toString())),Double.parseDouble(kg.getText().toString()),Double.parseDouble(minutes.getText().toString()));
             preview.setText("参考额外消耗 · "+value+" 千卡");if(!manual.isChecked()){updatingBurn[0]=true;burn.setText(String.valueOf(value));updatingBurn[0]=false;}
-        }catch(Exception e){preview.setText("填写有效的强度、体重和时长后估算");if(!manual.isChecked()){updatingBurn[0]=true;burn.setText("");updatingBurn[0]=false;}}};
+        }catch(Exception e){preview.setText("填写有效的体重、时长和距离后估算");if(!manual.isChecked()){updatingBurn[0]=true;burn.setText("");updatingBurn[0]=false;}}};
         TextWatcher watcher=new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){calculate.run();}};
-        minutes.addTextChangedListener(watcher);kg.addTextChangedListener(watcher);met.addTextChangedListener(watcher);
+        TextWatcher parameterWatcher=new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){manual.setChecked(false);calculate.run();}};
+        minutes.addTextChangedListener(parameterWatcher);kg.addTextChangedListener(parameterWatcher);distance.addTextChangedListener(parameterWatcher);
         manual.setOnCheckedChangeListener((v,on)->calculate.run());
         burn.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int b,int c){if(!updatingBurn[0]&&!manual.isChecked())manual.setChecked(true);}});
         button(form,"使用参考估算",()->{manual.setChecked(false);calculate.run();});
-        reference.setText("2024 成人活动汇编 · "+ExerciseCatalog.CODES[initial]+" · 参考 MET "+n(ExerciseCatalog.MET[initial]));
+        reference.setText("距离选填；填写后按平均速度估算，未填按项目估算。");
         sport.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){int previous=initial;
             public void onNothingSelected(AdapterView<?> p){}
-            public void onItemSelected(AdapterView<?> p,View v,int pos,long id){custom.setVisibility(pos==ExerciseCatalog.NAMES.length-1?View.VISIBLE:View.GONE);reference.setText("2024 成人活动汇编 · "+ExerciseCatalog.CODES[pos]+" · 参考 MET "+n(ExerciseCatalog.MET[pos]));if(pos!=previous){previous=pos;met.setText(n(ExerciseCatalog.MET[pos]));}calculate.run();}
+            public void onItemSelected(AdapterView<?> p,View v,int pos,long id){custom.setVisibility(pos==ExerciseCatalog.NAMES.length-1?View.VISIBLE:View.GONE);distance.setEnabled(ExerciseCatalog.distanceSport(pos));if(pos!=previous){previous=pos;manual.setChecked(false);}calculate.run();}
         });
-        text(form,"按 (MET−1) × 3.5 × 体重 ÷ 200 × 分钟估算，已扣除静息消耗。手动值请填运动额外消耗；仅记录日常活动以外的运动。参考值主要适用于19–59岁成人。",12,false);
+        text(form,"额外消耗已扣除静息消耗。平路速度估值不含坡度、风阻；可按设备记录修改。",12,false);
         button(form,"参考值来源",()->{try{startActivity(new Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://pacompendium.com/adult-compendium/")));}catch(Exception e){toast("无法打开浏览器");}});
-        AlertDialog d=dialog("记录运动",form);calculate.run();button(form,"保存运动",()->{try{
-            double duration=number(minutes,1,1440),mass=number(kg,1,600),intensity=number(met,1,25);
+        AlertDialog d=dialog("记录运动",form);calculate.run();d.setButton(AlertDialog.BUTTON_POSITIVE,"保存运动",(android.content.DialogInterface.OnClickListener)null);d.getButton(AlertDialog.BUTTON_POSITIVE).setVisibility(View.VISIBLE);d.getButton(AlertDialog.BUTTON_POSITIVE).setText("保存运动");d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{try{
+            double duration=number(minutes,1,1440),mass=number(kg,1,600),distanceKm=distance.isEnabled()&&!distance.getText().toString().trim().isEmpty()?number(distance,0,2000):0,intensity=ExerciseCatalog.intensity(sport.getSelectedItemPosition(),distanceKm,duration);
             String name=sport.getSelectedItemPosition()==ExerciseCatalog.NAMES.length-1?custom.getText().toString().trim():sport.getSelectedItem().toString();
             if(name.isEmpty()){custom.setError("请填写运动名称");return;}
             double energy=manual.isChecked()?number(burn,0,50000):ExerciseCatalog.estimate(intensity,mass,duration);
-            put(draft,"minutes",duration);put(draft,"kg",mass);put(draft,"sport",name);put(draft,"met",intensity);put(draft,"burnMode",manual.isChecked()?"manual":"estimate");put(draft,"burn",energy);save(draft,d);
+            put(draft,"distanceKm",distanceKm);put(draft,"minutes",duration);put(draft,"kg",mass);put(draft,"sport",name);put(draft,"met",intensity);put(draft,"burnMode",manual.isChecked()?"manual":"estimate");put(draft,"burn",energy);save(draft,d);
         }catch(Exception e){toast(e.getMessage());}});deleteButton(form,record,d);
     }
     void library(LinearLayout parent,String initial,AlertDialog owner){library(parent,initial,owner,"");}
